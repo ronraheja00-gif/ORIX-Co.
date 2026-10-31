@@ -876,17 +876,23 @@ const CONFIG = {
     let cx = 0, cy = 0, inside = false, size = 0, sizeV = 0, placed = false, raf = 0, visible = true;
     // the head is a pool of water: a smooth outline whose edge ripples gently and slowly
     const RIPPLE = [
-      { k: 2, a: 0.055, w: 0.55 },
-      { k: 3, a: 0.04, w: -0.8 },
-      { k: 5, a: 0.018, w: 1.25 },
+      { k: 2, a: 0.075, w: 1.1 },
+      { k: 3, a: 0.06, w: -1.6 },
+      { k: 4, a: 0.035, w: 2.3 },
+      { k: 5, a: 0.02, w: -2.9 },
     ];
+    // flow state: how agitated the water is, plus the direction and amount of stretch
+    let energy = 0, energyV = 0, stretch = 0, dir = 0, lastX = 0, lastY = 0;
     const RIPPLE_MAX = RIPPLE.reduce((m, h) => m + h.a, 0);
     const pool = (x, y, r, t) => {
-      const n = 36, p = [];
+      const n = 48, p = [];
+      const amp = 1 + 1.6 * energy; // ripples swell while moving and slosh after stopping
       for (let i = 0; i < n; i++) {
         const th = (i / n) * Math.PI * 2;
         let f = 1;
-        RIPPLE.forEach((h) => (f += h.a * Math.sin(h.k * th + t * h.w + h.k)));
+        RIPPLE.forEach((h) => (f += amp * h.a * Math.sin(h.k * th + t * h.w + h.k)));
+        // squash and stretch along the direction of travel
+        f *= 1 + stretch * Math.cos(2 * (th - dir));
         p.push([x + Math.cos(th) * r * f, y + Math.sin(th) * r * f]);
       }
       // closed Catmull-Rom curve through the points, written as cubic Béziers
@@ -950,6 +956,19 @@ const CONFIG = {
         nodes[i].x += (nodes[i - 1].x - nodes[i].x) * 0.42;
         nodes[i].y += (nodes[i - 1].y - nodes[i].y) * 0.42;
       }
+      // velocity of the head drives the flow
+      const vx = nodes[0].x - lastX, vy = nodes[0].y - lastY;
+      lastX = nodes[0].x;
+      lastY = nodes[0].y;
+      const speed = Math.hypot(vx, vy);
+      if (speed > 0.5) dir = Math.atan2(vy, vx);
+      const target = Math.min(1, speed / 28);
+      // springy energy: rises with speed, then overshoots and wobbles back down when you stop
+      energyV += (target - energy) * 0.08;
+      energyV *= 0.86;
+      energy = Math.max(0, energy + energyV);
+      stretch += (Math.min(0.32, speed / 90) - stretch) * 0.12;
+
       // the tail stays inside the pool's innermost edge, so at rest only the pool's outline shows
       const inner = 1 - RIPPLE_MAX;
       const pts = nodes.map((n, i) => {
@@ -972,7 +991,7 @@ const CONFIG = {
       }
       const tail = nodes[N - 1];
       const moving = Math.abs(cx - tail.x) + Math.abs(cy - tail.y) > 0.3;
-      const busy = visible && (inside || size > 0.004 || Math.abs(sizeV) > 0.001 || moving);
+      const busy = visible && (inside || size > 0.004 || Math.abs(sizeV) > 0.001 || moving || energy > 0.01);
       raf = busy ? requestAnimationFrame(frame) : 0;
     };
     const kick = () => {

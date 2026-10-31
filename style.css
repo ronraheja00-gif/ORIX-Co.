@@ -466,6 +466,23 @@ svg { display: block; }
   height: min(86%, 820px);
 }
 .hero__trace--wide path { stroke: rgba(10, 10, 10, 0.07); }
+
+/* Torch: the watermark only shows where the liquid light falls (set up by script). */
+.has-torch .hero__trace--torch {
+  -webkit-mask-image:
+    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
+    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
+    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
+  mask-image:
+    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
+    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
+    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+/* lit lines are crisper and the fill glows a little */
+.has-torch .hero__trace--torch path { stroke: rgba(10, 10, 10, 0.3); }
+.has-torch .hero__trace--torch .trace-fill { fill: rgba(255, 255, 255, 0.9); }
 .hero--intro .hero__trace {
   left: auto;
   right: var(--gutter);
@@ -1456,6 +1473,23 @@ body[data-page="institute"] .button:hover .arrow { color: var(--red); }
   height: min(86%, 820px);
 }
 .hero__trace--wide path { stroke: rgba(10, 10, 10, 0.07); }
+
+/* Torch: the watermark only shows where the liquid light falls (set up by script). */
+.has-torch .hero__trace--torch {
+  -webkit-mask-image:
+    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
+    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
+    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
+  mask-image:
+    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
+    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
+    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+/* lit lines are crisper and the fill glows a little */
+.has-torch .hero__trace--torch path { stroke: rgba(10, 10, 10, 0.3); }
+.has-torch .hero__trace--torch .trace-fill { fill: rgba(255, 255, 255, 0.9); }
 .hero--intro .hero__trace { opacity: 0.6; }
 }
 
@@ -1487,6 +1521,23 @@ body[data-page="institute"] .button:hover .arrow { color: var(--red); }
   height: min(86%, 820px);
 }
 .hero__trace--wide path { stroke: rgba(10, 10, 10, 0.07); }
+
+/* Torch: the watermark only shows where the liquid light falls (set up by script). */
+.has-torch .hero__trace--torch {
+  -webkit-mask-image:
+    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
+    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
+    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
+  mask-image:
+    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
+    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
+    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+/* lit lines are crisper and the fill glows a little */
+.has-torch .hero__trace--torch path { stroke: rgba(10, 10, 10, 0.3); }
+.has-torch .hero__trace--torch .trace-fill { fill: rgba(255, 255, 255, 0.9); }
 .hero--intro .hero__trace { right: -60px; height: 58%; }
 }
 

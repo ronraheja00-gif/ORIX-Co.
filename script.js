@@ -843,22 +843,72 @@ const CONFIG = {
       title.classList.add("is-split");
     }
 
+    initTorch();
+  }
+
+  /* ---------- hero: the watermark is lit by a liquid "torch" that trails the cursor ----------
+     Three soft pools of light follow the pointer at different speeds and gently pulse, so the lit
+     area stretches and wobbles like a fluid. With no pointer in the hero (or on touch), it drifts. */
+  function initTorch() {
     const hero = doc.querySelector("[data-spot]");
-    if (!hero || reduceMotion.matches) return;
+    const mark = doc.querySelector("[data-torch]");
+    if (!hero || !mark || reduceMotion.matches) return;
+    hero.classList.add("has-torch");
+
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-    let raf = 0, mx = 50, my = 40;
+    const blobs = [
+      { k: 0.16, r: 210, x: 0, y: 0 },
+      { k: 0.08, r: 150, x: 0, y: 0 },
+      { k: 0.045, r: 110, x: 0, y: 0 },
+    ];
+    let px = 0, py = 0, pointerIn = false, raf = 0, visible = true, started = false;
+    const t0 = performance.now();
+
     hero.addEventListener("pointermove", (e) => {
       if (!finePointer.matches) return;
-      const r = hero.getBoundingClientRect();
-      mx = ((e.clientX - r.left) / r.width) * 100;
-      my = ((e.clientY - r.top) / r.height) * 100;
-      if (!raf)
-        raf = requestAnimationFrame(() => {
-          hero.style.setProperty("--mx", mx.toFixed(1) + "%");
-          hero.style.setProperty("--my", my.toFixed(1) + "%");
-          raf = 0;
-        });
+      pointerIn = true;
+      px = e.clientX;
+      py = e.clientY;
     });
+    hero.addEventListener("pointerleave", () => (pointerIn = false));
+
+    const frame = (now) => {
+      const t = (now - t0) / 1000;
+      const mr = mark.getBoundingClientRect();
+      const hr = hero.getBoundingClientRect();
+      // target in the watermark's own coordinates
+      let tx, ty;
+      if (pointerIn) {
+        tx = px - mr.left;
+        ty = py - mr.top;
+      } else {
+        tx = mr.width * (0.5 + 0.32 * Math.sin(t * 0.21));
+        ty = mr.height * (0.45 + 0.26 * Math.sin(t * 0.33 + 1.2));
+      }
+      if (!started) {
+        blobs.forEach((b) => ((b.x = tx), (b.y = ty)));
+        started = true;
+      }
+      blobs.forEach((b, i) => {
+        b.x += (tx - b.x) * b.k;
+        b.y += (ty - b.y) * b.k;
+        const pulse = 1 + 0.12 * Math.sin(t * (1.1 + i * 0.37) + i * 2.1);
+        mark.style.setProperty(`--b${i}x`, b.x.toFixed(1) + "px");
+        mark.style.setProperty(`--b${i}y`, b.y.toFixed(1) + "px");
+        mark.style.setProperty(`--b${i}r`, (b.r * pulse).toFixed(1) + "px");
+      });
+      // the warm light follows the lead pool
+      const lead = blobs[0];
+      hero.style.setProperty("--mx", (((lead.x + mr.left - hr.left) / hr.width) * 100).toFixed(2) + "%");
+      hero.style.setProperty("--my", (((lead.y + mr.top - hr.top) / hr.height) * 100).toFixed(2) + "%");
+      raf = visible ? requestAnimationFrame(frame) : 0;
+    };
+
+    // only animate while the hero is on screen
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible && !raf) raf = requestAnimationFrame(frame);
+    }).observe(hero);
   }
 
   // Products are rendered by script, so jump to #product links after rendering.

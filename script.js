@@ -79,7 +79,7 @@ const CONFIG = {
     viewLabel: "View",
     statusLabel: "Status",
     focusLabel: "Focus",
-    // visual: "arch" | "line" | "rings"   status: "Open Source" | "Commercial" | "Both"
+    // visual: "chevron" | "line" | "stem"   status: "Open Source" | "Commercial" | "Both"
     items: [
       {
         name: "Elements",
@@ -87,7 +87,7 @@ const CONFIG = {
         tags: ["Design system", "Interface", "Toolkit"],
         status: "Open Source",
         href: "#", // TODO: product URL
-        visual: "arch",
+        visual: "chevron",
       },
       {
         name: "Netherite",
@@ -103,7 +103,7 @@ const CONFIG = {
         tags: ["Privacy", "Automation", "Tooling"],
         status: "Both",
         href: "#",
-        visual: "rings",
+        visual: "stem",
       },
     ],
   },
@@ -226,6 +226,34 @@ const CONFIG = {
     });
   }
 
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs) {
+    const el = doc.createElementNS(SVG_NS, tag);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  // Abstract product panels drawn with the logo's geometry (38° diagonals, pointed stem).
+  const VISUALS = {
+    chevron() {
+      const svg = svgEl("svg", { viewBox: "0 0 400 300", preserveAspectRatio: "xMidYMid meet", "aria-hidden": "true", focusable: "false" });
+      [[0, "v-faint"], [34, "v-hair"], [68, "v-hair"], [102, "v-red"]].forEach(([dy, cls]) => {
+        svg.append(svgEl("path", { class: cls, d: `M90 ${40 + dy} 200 ${127 + dy} 310 ${40 + dy}` }));
+      });
+      return svg;
+    },
+    stem() {
+      const svg = svgEl("svg", { viewBox: "0 0 400 300", preserveAspectRatio: "xMidYMid meet", "aria-hidden": "true", focusable: "false" });
+      svg.append(
+        svgEl("path", { class: "v-face", d: "M172 54 200 40V262L172 236Z" }),
+        svgEl("path", { class: "v-hair", d: "M172 54 200 40 228 54V236L200 262 172 236Z" }),
+        svgEl("path", { class: "v-faint", d: "M200 40V262" }),
+        svgEl("path", { class: "v-red", d: "M172 236 200 262 228 236" })
+      );
+      return svg;
+    },
+  };
+
   const arrow = () => {
     const ns = "http://www.w3.org/2000/svg";
     const svg = doc.createElementNS(ns, "svg");
@@ -309,11 +337,14 @@ const CONFIG = {
         ...P.items.map((p, i) => {
           const num = String(i + 1).padStart(2, "0");
           const id = p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-          const visual = h("div", { class: `product__visual visual visual--${p.visual || "arch"}`, "aria-hidden": "true", "data-reveal": "" }, [
-            h("span", { class: "visual__a" }),
-            h("span", { class: "visual__b" }),
-            h("span", { class: "visual__c" }),
-          ]);
+          const kind = p.visual || "chevron";
+          const visual = h(
+            "div",
+            { class: `product__visual visual visual--${kind}`, "aria-hidden": "true", "data-reveal": "" },
+            VISUALS[kind]
+              ? [VISUALS[kind]()]
+              : [h("span", { class: "visual__a" }), h("span", { class: "visual__b" }), h("span", { class: "visual__c" })]
+          );
           const tags = h("ul", { class: "tags" }, p.tags.map((t) => h("li", { text: tpl(t) })));
           const body = h("div", { class: "product__body" }, [
             h("p", { class: "eyebrow eyebrow--rule product__index", "data-reveal": "", text: num }),

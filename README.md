@@ -1,6 +1,6 @@
 # ORIX & CO — marketing site
 
-A static three-page site built with plain HTML, CSS and vanilla JS. There is no build step and there are no dependencies.
+A static three-page site built with plain HTML, CSS and vanilla JS. There is no build step, there are no dependencies and nothing loads from external servers. Every link and asset uses a relative path.
 
 ```
 index.html          Home
@@ -9,7 +9,10 @@ institute.html      Institute of Adore
 404.html            Not-found page (picked up automatically by Netlify, Vercel and GitHub Pages)
 style.css           All styles. Colours, fonts and spacing are CSS variables in :root
 script.js           CONFIG (all copy) at the top, site behaviour below
+assets/logo.svg     The logo mark (vector, traced from the supplied logo)
+assets/fonts/       Self-hosted Tinos (Times New Roman–compatible fallback, Apache 2.0)
 favicon.svg, apple-touch-icon.png, og-image.png, robots.txt
+screenshots/        Full-page screenshots of each page at 1440 / 768 / 390px
 ```
 
 ## Editing content
@@ -40,13 +43,15 @@ The HTML holds the default copy as a fallback for visitors without JS and for se
 1. Find and replace `ORIX &amp; CO` in the `<head>` of the four `.html` files.
 2. Regenerate `og-image.png` (1200×630), the social preview image.
 
-### Colours and type
+### Colours, type and logo
 
-Edit the `:root` variables in `style.css`. If the logo's red differs, change `--red`.
+- Edit the `:root` variables in `style.css`. `--red` (#CC111A) and `--red-deep` (#A30C14) are sampled from the logo.
+- Type: `"Times New Roman", Tinos, Times, serif`. Macs and Windows PCs use their built-in Times New Roman. Other devices get the self-hosted Tinos files in `assets/fonts/`.
+- The logo appears inline in the header, the home hero, the footer and the 404 page, and is also drawn as a faint outline behind each page's hero. `assets/logo.svg` is the standalone file. The favicon and `apple-touch-icon.png` use the same mark.
 
 ### Swapping in real product visuals
 
-Each product row has an abstract CSS panel (`.visual--arch`, `.visual--line`, `.visual--rings`). To use a real image instead, replace the panel's content with `<img src="..." alt="..." loading="lazy" width="..." height="...">` inside the renderer in `script.js` (look for `renderers.products`), or select a different variant per product with `visual`.
+Each product row has an abstract panel drawn from the logo's geometry (`visual: "chevron" | "line" | "stem"` in CONFIG). To use a real image instead, replace the panel's content with `<img src="..." alt="..." loading="lazy" width="..." height="...">` inside the renderer in `script.js` (look for `renderers.products`), or select a different variant per product with `visual`.
 
 ### Enquiry form
 
@@ -58,11 +63,19 @@ The form validates in the browser and shows a thank-you message, but nothing is 
 
 Any static server will do:
 
+From the project folder:
+
 ```bash
-python3 -m http.server 8080
+python3 -m http.server 8000
 ```
 
-Then open http://localhost:8080. Opening the files directly with `file://` also works.
+Then open http://localhost:8000.
+
+Or, with Node:
+
+```bash
+npx serve .
+```
 
 ## Deploy
 

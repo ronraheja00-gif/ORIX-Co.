@@ -23,9 +23,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tinos:ital@0;1&amp;display=swap">
+  <link rel="preload" href="assets/fonts/tinos-regular-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
@@ -34,7 +32,7 @@
 
   <header class="site-header" data-header>
     <div class="container header__inner">
-      <a class="wordmark" href="index.html" data-brand data-brand-label="{name} — Home" aria-label="ORIX &amp; CO — Home">ORIX &amp; CO</a>
+      <a class="brand" href="index.html" data-brand-label="{name} — Home" aria-label="ORIX &amp; CO — Home"><svg class="brand__mark" viewBox="0 0 370 530" aria-hidden="true" focusable="false"><path fill="#CC111A" d="M0 4 43 110 184 221 327 110 369 4V144L184 287 0 144Z"/><path fill="#CC111A" d="M0 170 163 293 133 330 52 267Z"/><path fill="#CC111A" d="M369 166 315 266 234 333V485L184 528 134 485V331L184 307Z"/><path fill="#A30C14" d="M134 331 184 307V528L134 485Z"/></svg><span class="wordmark" data-brand>ORIX &amp; CO</span></a>
       <nav class="nav" aria-label="Primary">
         <ul class="nav__list">
           <li><a class="nav__link link" href="index.html" data-c="nav.home">Home</a></li>
@@ -62,7 +60,7 @@
   <main id="main">
     <section class="hero hero--page" aria-labelledby="institute-title">
       <div class="hero__light" data-parallax="0.18" aria-hidden="true"></div>
-      <div class="hero__arch" aria-hidden="true"></div>
+      <svg class="hero__trace" viewBox="0 0 370 530" aria-hidden="true" focusable="false"><path class="trace-fill" d="M0 4 43 110 184 221 327 110 369 4V144L184 287 0 144Z"/><path d="M0 4 43 110 184 221 327 110 369 4V144L184 287 0 144Z"/><path class="trace-fill" d="M0 170 163 293 133 330 52 267Z"/><path d="M0 170 163 293 133 330 52 267Z"/><path class="trace-fill" d="M369 166 315 266 234 333V485L184 528 134 485V331L184 307Z"/><path d="M369 166 315 266 234 333V485L184 528 134 485V331L184 307Z"/></svg>
       <div class="hero__content">
         <h1 class="hero__title hero__title--page" id="institute-title" data-c="institute.hero.title" data-reveal>Institute of Adore</h1>
         <p class="hero__sub eyebrow" data-c="institute.hero.sub" data-reveal style="--d:200ms">Training &middot; Mentorship &middot; Careers</p>
@@ -159,7 +157,7 @@
   <footer class="site-footer">
     <div class="container">
       <div class="footer__top">
-        <a class="footer__mark" href="index.html" data-brand="accent">ORIX <span class="amp">&amp;</span> CO</a>
+        <a class="footer__mark" href="index.html" data-brand-label="{name} — Home" aria-label="ORIX &amp; CO — Home"><svg class="brand__mark" viewBox="0 0 370 530" aria-hidden="true" focusable="false"><path fill="#CC111A" d="M0 4 43 110 184 221 327 110 369 4V144L184 287 0 144Z"/><path fill="#CC111A" d="M0 170 163 293 133 330 52 267Z"/><path fill="#CC111A" d="M369 166 315 266 234 333V485L184 528 134 485V331L184 307Z"/><path fill="#A30C14" d="M134 331 184 307V528L134 485Z"/></svg><span data-brand="accent">ORIX <span class="amp">&amp;</span> CO</span></a>
         <nav class="footer__nav" aria-label="Footer">
           <ul class="footer__links">
             <li><a class="link" href="index.html" data-c="nav.home">Home</a></li>

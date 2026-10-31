@@ -576,7 +576,6 @@ svg { display: block; }
 }
 
 /* ---------- Marquee ---------- */
-.showcase + .band { border-top: 1px solid var(--hair-dark); }
 .band {
   padding-block: clamp(72px, 8vw, 120px);
   background: var(--ink);
@@ -1103,25 +1102,26 @@ svg { display: block; }
 /* ---------- Home: product showcase (the hook) ---------- */
 .showcase {
   position: relative;
+  isolation: isolate;
   padding-block: var(--section);
-  background: var(--ink);
-  color: var(--on-dark);
+  background: var(--ivory);
+  color: var(--ink);
   overflow: hidden;
 }
 .showcase::before {
-  /* a slow sweep of light across the band, at the logo's diagonal */
+  /* the hero's soft diagonal light, at the logo's angle */
   content: "";
   position: absolute;
-  inset: -40% -20%;
+  inset: -20% -10%;
+  z-index: -1;
   pointer-events: none;
-  background: linear-gradient(218deg, transparent 40%, rgba(255, 255, 255, 0.045) 50%, transparent 60%);
-  animation: sweep 14s var(--ease-soft) infinite alternate;
+  background:
+    radial-gradient(50% 60% at 85% 20%, rgba(255, 255, 255, 0.9), transparent 70%),
+    linear-gradient(218deg,
+      transparent 22%, var(--shade) 32%, transparent 42%,
+      transparent 58%, rgba(110, 88, 64, 0.05) 67%, transparent 76%);
+  filter: blur(18px);
 }
-@keyframes sweep {
-  from { transform: translateX(-18%); }
-  to { transform: translateX(18%); }
-}
-.showcase .eyebrow { color: var(--on-dark-mute); }
 .showcase__head {
   position: relative;
   display: flex;
@@ -1130,9 +1130,8 @@ svg { display: block; }
   gap: 24px;
   margin-bottom: clamp(40px, 6vw, 88px);
 }
-.cta--light { color: var(--on-dark); }
 
-.showcase__list { position: relative; border-bottom: 1px solid var(--hair-dark); }
+.showcase__list { position: relative; border-bottom: 1px solid var(--hair); }
 .showcase__row {
   position: relative;
   display: grid;
@@ -1140,9 +1139,9 @@ svg { display: block; }
   align-items: center;
   gap: var(--col-gap);
   padding-block: clamp(14px, 2.2vw, 30px);
-  border-top: 1px solid var(--hair-dark);
+  border-top: 1px solid var(--hair);
   text-decoration: none;
-  color: var(--on-dark);
+  color: var(--ink);
   outline-offset: -1px;
 }
 .showcase__name {
@@ -1152,8 +1151,8 @@ svg { display: block; }
   white-space: nowrap;
   /* outlined type that fills with white on hover */
   color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5);
-  background: linear-gradient(90deg, var(--white) 50%, transparent 50%) 100% 0 / 200% 100% no-repeat;
+  -webkit-text-stroke: 1px rgba(10, 10, 10, 0.55);
+  background: linear-gradient(90deg, var(--ink) 50%, transparent 50%) 100% 0 / 200% 100% no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   transition: background-position 1s var(--ease), transform 1s var(--ease), -webkit-text-stroke-color 0.6s;
@@ -1162,16 +1161,16 @@ svg { display: block; }
   display: flex;
   align-items: center;
   gap: 24px;
-  opacity: 0.55;
+  opacity: 0.6;
   transition: opacity 0.6s var(--ease-soft);
 }
-.showcase__go { display: inline-flex; color: var(--on-dark); }
+.showcase__go { display: inline-flex; color: var(--ink); }
 .showcase__go .arrow { width: 44px; height: 12px; }
 
 .showcase__row:hover .showcase__name,
 .showcase__row:focus-visible .showcase__name {
   background-position: 0 0;
-  -webkit-text-stroke-color: var(--white);
+  -webkit-text-stroke-color: var(--ink);
   transform: translateX(clamp(8px, 1.4vw, 24px));
 }
 .showcase__row:hover .showcase__meta,
@@ -1181,7 +1180,7 @@ svg { display: block; }
 .showcase__row:hover .showcase__num,
 .showcase__row:focus-visible .showcase__num { color: var(--red); }
 /* dim the other rows while one is hovered */
-.showcase__list.is-hovering .showcase__row:not(:hover) .showcase__name { -webkit-text-stroke-color: rgba(255, 255, 255, 0.22); }
+.showcase__list.is-hovering .showcase__row:not(:hover) .showcase__name { -webkit-text-stroke-color: rgba(10, 10, 10, 0.16); }
 
 .showcase__preview {
   position: fixed;
@@ -1201,7 +1200,7 @@ svg { display: block; }
   inset: 0;
   aspect-ratio: auto;
   border-radius: 18px;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 40px 80px -30px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 0 1px var(--hair), 0 40px 80px -30px rgba(10, 10, 10, 0.45);
   clip-path: inset(50% 50% 50% 50% round 18px);
   transition: clip-path 0.9s var(--ease);
 }
@@ -1210,7 +1209,7 @@ svg { display: block; }
 
 @media (hover: none), (pointer: coarse) {
   .showcase__preview { display: none; }
-  .showcase__name { color: var(--white); -webkit-text-stroke: 0; background: none; }
+  .showcase__name { color: var(--ink); -webkit-text-stroke: 0; background: none; }
 }
 
 /* ---------- Institute page: navy & gold from its crest ---------- */

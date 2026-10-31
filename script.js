@@ -931,8 +931,11 @@ const CONFIG = {
         if (trail[i].life <= 0) trail.splice(i, 1);
       }
       const pts = trail.map((p) => {
-        const e = 1 - Math.pow(1 - p.life, 2.2); // stays thick, then tapers off at the end
-        return { x: p.x, y: p.y, r: R * 0.95 * e * (1 + 0.09 * Math.sin(t * 3.1 + p.seed)) };
+        // behind the cursor the liquid spreads wider (up to ~2.2x), then tapers off at the end
+        const age = 1 - p.life;
+        const spread = R + R * 1.2 * Math.sin(Math.PI * Math.min(1, age * 1.5));
+        const fade = 1 - Math.pow(age, 3);
+        return { x: p.x, y: p.y, r: spread * fade * (1 + 0.09 * Math.sin(t * 3.1 + p.seed)) };
       });
       if (head > 0.01 && last) pts.push({ x: cx, y: cy, r: R * head * (1 + 0.05 * Math.sin(t * 2.3)) });
 

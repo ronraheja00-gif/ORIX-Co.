@@ -2,6 +2,7 @@
    CONTENT CONFIG — edit everything here.
    Tokens available inside any string:
      {name}       → COMPANY_NAME
+     {institute}  → INSTITUTE_NAME
      {tagline}    → TAGLINE
      {placement}  → PLACEMENT_CLAIM
      {email}      → EMAIL
@@ -9,7 +10,8 @@
    Wrap a word in *asterisks* inside a "statement" to mark it as the red accent.
    ========================================================================== */
 const CONFIG = {
-  COMPANY_NAME: "ORIX & CO",
+  COMPANY_NAME: "ORIX & Co.",
+  INSTITUTE_NAME: "Adore Institute of Technology",
   TAGLINE: "Built by the team behind SuperOrix",
   EMAIL: "hello@example.com", // TODO: replace with the real address
 
@@ -20,15 +22,15 @@ const CONFIG = {
   meta: {
     home: {
       title: "{name} — Quiet, considered technology",
-      description: "{name} builds considered software products and trains engineers through the Institute of Adore.",
+      description: "{name} builds considered software products and trains engineers through the {institute}.",
     },
     products: {
       title: "Products — {name}",
-      description: "Elements, Netherite and Phantom: three flagship products from {name}.",
+      description: "Elements, Netherite and Phantom: three flagship products from {name}",
     },
     institute: {
-      title: "Institute of Adore — {name}",
-      description: "Training, mentorship and careers at the Institute of Adore, by {name}.",
+      title: "{institute} — {name}",
+      description: "Training, mentorship and careers at the {institute}, by {name}",
     },
     notfound: {
       title: "Page not found — {name}",
@@ -39,13 +41,13 @@ const CONFIG = {
   nav: {
     home: "Home",
     products: "Products",
-    institute: "Institute of Adore",
+    institute: "{institute}",
     menu: "Menu",
   },
 
   home: {
     hero: {
-      title: "{name}.",
+      title: "{name}",
       sub: "{tagline}",
       cta: "Explore our products",
       ctaHref: "products.html",
@@ -62,11 +64,21 @@ const CONFIG = {
         { value: "3", label: "Flagship products" },
       ],
     },
+    institute: {
+      label: "The Institute",
+      cta: "Enter the Institute",
+      href: "institute.html",
+    },
     partners: {
       label: "In good company",
       // Only list real clients, partners, hackathons or platforms you have
-      // actually worked with. These are placeholders.
-      items: ["Partner One", "Hackathon One", "Platform One", "Partner Two", "Hackathon Two", "Platform Two"],
+      // actually worked with. Each item is either plain text ("Name") or a logo:
+      //   { name, logo: "assets/partners/file.png", width, height }
+      // Logos should be white on a transparent background (they sit on black).
+      items: [
+        { name: "MIT India — Maharashtra Institute of Technology", logo: "assets/partners/mit-india.png", width: 402, height: 120 },
+        { name: "MIT Institute of Design", logo: "assets/partners/mit-institute-of-design.png", width: 375, height: 120 },
+      ],
       speed: 36, // pixels per second — lower is slower
     },
   },
@@ -79,15 +91,32 @@ const CONFIG = {
     viewLabel: "View",
     statusLabel: "Status",
     focusLabel: "Focus",
-    // visual: "chevron" | "line" | "stem"   status: "Open Source" | "Commercial" | "Both"
+    downloadLabel: "Download",
+    // The three download cards shown under every product.
+    // {product} is replaced with the product name. Per-product links go in each
+    // product's `downloads` object below.
+    platforms: [
+      { id: "windows", label: "Windows", note: "Windows 10 / 11 · 64-bit", file: "{product}-Setup.exe" },
+      { id: "linux", label: "Linux", note: "AppImage · x86_64", file: "{product}.AppImage" },
+      { id: "mac", label: "macOS", note: "Apple silicon & Intel", file: "{product}.dmg" },
+    ],
+    // visual: "chevron" | "line" | "stem", or `image: { src, srcSmall, alt, width, height }`
+    // status: "Open Source" | "Commercial" | "Both"
     items: [
       {
         name: "Elements",
-        description: "A foundational component system for interfaces built with precision.",
-        tags: ["Design system", "Interface", "Toolkit"],
-        status: "Open Source",
+        description: "Verifiable searchable encryption. Search your documents without exposing them.",
+        tags: ["Searchable encryption", "AES-256-GCM", "Local keys"],
+        status: "Open Source", // TODO: confirm
         href: "#", // TODO: product URL
-        visual: "chevron",
+        image: {
+          src: "assets/products/elements-1600.webp",
+          srcSmall: "assets/products/elements-800.webp",
+          alt: "Elements sign-in screen: search your documents without exposing them",
+          width: 1600,
+          height: 900,
+        },
+        downloads: { windows: "#", linux: "#", mac: "#" }, // TODO: real download links
       },
       {
         name: "Netherite",
@@ -96,6 +125,7 @@ const CONFIG = {
         status: "Commercial",
         href: "#",
         visual: "line",
+        downloads: { windows: "#", linux: "#", mac: "#" },
       },
       {
         name: "Phantom",
@@ -104,13 +134,15 @@ const CONFIG = {
         status: "Both",
         href: "#",
         visual: "stem",
+        downloads: { windows: "#", linux: "#", mac: "#" },
       },
     ],
   },
 
   institute: {
     hero: {
-      title: "Institute of Adore",
+      // The hero shows the institute logo; INSTITUTE_NAME is used as its alt text.
+      logo: "assets/institute/adore-logo-1600.webp",
       sub: "Training · Mentorship · Careers",
     },
     intro: {
@@ -189,6 +221,7 @@ const CONFIG = {
   const tpl = (s, extra) =>
     String(s == null ? "" : s)
       .replace(/\{name\}/g, C.COMPANY_NAME)
+      .replace(/\{institute\}/g, C.INSTITUTE_NAME)
       .replace(/\{tagline\}/g, C.TAGLINE)
       .replace(/\{placement\}/g, C.PLACEMENT_CLAIM)
       .replace(/\{email\}/g, C.EMAIL)
@@ -302,6 +335,12 @@ const CONFIG = {
     doc.querySelectorAll("[data-brand-label]").forEach((el) => {
       el.setAttribute("aria-label", tpl(el.dataset.brandLabel));
     });
+    doc.querySelectorAll("[data-alt]").forEach((el) => {
+      el.setAttribute("alt", tpl(get(el.dataset.alt) || el.getAttribute("alt")));
+    });
+    doc.querySelectorAll("[data-aria]").forEach((el) => {
+      el.setAttribute("aria-label", tpl(el.dataset.aria));
+    });
     doc.querySelectorAll("[data-href]").forEach((el) => {
       const val = get(el.dataset.href);
       if (val) el.setAttribute("href", val);
@@ -319,6 +358,66 @@ const CONFIG = {
   }
 
   /* ---------- list renderers ---------- */
+  /* Download cards: one rounded panel per platform with a small window mock. */
+  function windowMock(os, name, file) {
+    const bar = (title, controls) => h("div", { class: `win__bar win__bar--${os}` }, [...controls, h("span", { class: "win__title", text: title })]);
+    if (os === "windows") {
+      return h("div", { class: "win win--light" }, [
+        h("div", { class: "win__bar win__bar--windows" }, [
+          h("span", { class: "win__title", text: `${name} Setup` }),
+          h("span", { class: "win__ctrls" }, [h("i", { class: "c-min" }), h("i", { class: "c-max" }), h("i", { class: "c-close" })]),
+        ]),
+        h("div", { class: "win__body win__body--setup" }, [
+          h("span", { class: "setup__name", text: name }),
+          h("span", { class: "setup__status", text: "Installing…" }),
+          h("span", { class: "setup__bar" }, [h("i")]),
+          h("span", { class: "setup__file", text: file }),
+        ]),
+      ]);
+    }
+    if (os === "linux") {
+      return h("div", { class: "win win--dark" }, [
+        bar("bash", [h("span", { class: "win__dots win__dots--mono" }, [h("i"), h("i"), h("i")])]),
+        h("div", { class: "win__body win__body--term" }, [
+          h("span", { class: "term__line" }, [h("b", { text: "$ " }), `chmod +x ${file}`]),
+          h("span", { class: "term__line" }, [h("b", { text: "$ " }), `./${file}`]),
+          h("span", { class: "term__line term__line--mute", text: `Starting ${name}…` }),
+          h("span", { class: "term__line" }, [h("b", { text: "$ " }), h("span", { class: "term__cursor" })]),
+        ]),
+      ]);
+    }
+    return h("div", { class: "win win--light" }, [
+      bar(file, [h("span", { class: "win__dots" }, [h("i"), h("i"), h("i")])]),
+      h("div", { class: "win__body win__body--dmg" }, [
+        h("span", { class: "dmg__item" }, [h("span", { class: "dmg__app", text: name.charAt(0) }), h("span", { class: "dmg__label", text: name })]),
+        h("span", { class: "dmg__arrow" }, [arrow()]),
+        h("span", { class: "dmg__item" }, [h("span", { class: "dmg__folder" }), h("span", { class: "dmg__label", text: "Applications" })]),
+      ]),
+    ]);
+  }
+
+  function osCards(p) {
+    const P = C.products;
+    const name = tpl(p.name);
+    return h("div", { class: "container" }, [
+      h(
+        "ul",
+        { class: "os-grid", "aria-label": `${P.downloadLabel} ${name}` },
+        P.platforms.map((os, i) => {
+          const file = tpl(os.file).replace(/\{product\}/g, name.replace(/\s+/g, ""));
+          return h("li", { "data-reveal": "", style: `--d:${i * 120}ms` }, [
+            h("a", { class: `os-card os-card--${os.id}`, href: (p.downloads && p.downloads[os.id]) || "#", "aria-label": `${P.downloadLabel} ${name} for ${os.label}` }, [
+              h("span", { class: "os-card__panel", "aria-hidden": "true" }, [windowMock(os.id, name, file)]),
+              h("span", { class: "os-card__label", text: os.label }),
+              h("span", { class: "os-card__note", text: tpl(os.note) }),
+              h("span", { class: "cta os-card__cta" }, [h("span", { class: "cta__text", text: P.downloadLabel }), arrow()]),
+            ]),
+          ]);
+        })
+      ),
+    ]);
+  }
+
   const renderers = {
     stats(el) {
       el.replaceChildren(
@@ -337,14 +436,31 @@ const CONFIG = {
         ...P.items.map((p, i) => {
           const num = String(i + 1).padStart(2, "0");
           const id = p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-          const kind = p.visual || "chevron";
-          const visual = h(
-            "div",
-            { class: `product__visual visual visual--${kind}`, "aria-hidden": "true", "data-reveal": "" },
-            VISUALS[kind]
-              ? [VISUALS[kind]()]
-              : [h("span", { class: "visual__a" }), h("span", { class: "visual__b" }), h("span", { class: "visual__c" })]
-          );
+          const kind = p.image ? "image" : p.visual || "chevron";
+          let visual;
+          if (p.image) {
+            const im = p.image;
+            visual = h("figure", { class: "product__visual visual visual--image", "data-reveal": "" }, [
+              h("img", {
+                src: im.src,
+                srcset: im.srcSmall ? `${im.srcSmall} 800w, ${im.src} ${im.width}w` : im.src,
+                sizes: "(max-width: 860px) 92vw, 58vw",
+                alt: tpl(im.alt || p.name),
+                width: im.width,
+                height: im.height,
+                loading: "lazy",
+                decoding: "async",
+              }),
+            ]);
+          } else {
+            visual = h(
+              "div",
+              { class: `product__visual visual visual--${kind}`, "aria-hidden": "true", "data-reveal": "" },
+              VISUALS[kind]
+                ? [VISUALS[kind]()]
+                : [h("span", { class: "visual__a" }), h("span", { class: "visual__b" }), h("span", { class: "visual__c" })]
+            );
+          }
           const tags = h("ul", { class: "tags" }, p.tags.map((t) => h("li", { text: tpl(t) })));
           const body = h("div", { class: "product__body" }, [
             h("p", { class: "eyebrow eyebrow--rule product__index", "data-reveal": "", text: num }),
@@ -362,9 +478,9 @@ const CONFIG = {
               arrow(),
             ]),
           ]);
-          return h("article", { class: "product" + (i % 2 ? " product--reverse" : ""), id, "aria-labelledby": `${id}-title` }, [
-            h("div", { class: "container grid product__grid" }, [visual, body]),
-          ]);
+          const children = [h("div", { class: "container grid product__grid" }, [visual, body])];
+          if (p.downloads) children.push(osCards(p));
+          return h("article", { class: "product" + (i % 2 ? " product--reverse" : ""), id, "aria-labelledby": `${id}-title` }, children);
         })
       );
     },
@@ -523,7 +639,7 @@ const CONFIG = {
     const marquee = doc.querySelector("[data-marquee]");
     if (!marquee) return;
     const track = marquee.querySelector(".marquee__track");
-    const items = C.home.partners.items.map(tpl);
+    const items = C.home.partners.items.map((it) => (typeof it === "string" ? { name: tpl(it) } : { ...it, name: tpl(it.name) }));
     if (!items.length) {
       marquee.closest("section").hidden = true;
       return;
@@ -533,8 +649,12 @@ const CONFIG = {
       const ul = h("ul", { class: "marquee__group" });
       if (hidden) ul.setAttribute("aria-hidden", "true");
       for (let r = 0; r < repeat; r++) {
-        items.forEach((name, i) => {
-          const li = h("li", { class: "marquee__item" }, [h("span", { class: "marquee__name", text: name })]);
+        items.forEach((it) => {
+          const quiet = hidden || r > 0;
+          const content = it.logo
+            ? h("img", { class: "marquee__logo", src: it.logo, alt: quiet ? "" : it.name, width: it.width || 300, height: it.height || 100, decoding: "async" })
+            : h("span", { class: "marquee__name", text: it.name });
+          const li = h("li", { class: "marquee__item" + (it.logo ? " marquee__item--logo" : "") }, [content]);
           // Only the first copy is exposed to assistive tech.
           if (r > 0 && !hidden) li.setAttribute("aria-hidden", "true");
           ul.append(li);

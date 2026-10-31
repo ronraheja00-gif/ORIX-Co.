@@ -9,7 +9,10 @@ institute.html      Institute of Adore
 404.html            Not-found page (picked up automatically by Netlify, Vercel and GitHub Pages)
 style.css           All styles. Colours, fonts and spacing are CSS variables in :root
 script.js           CONFIG (all copy) at the top, site behaviour below
-assets/logo.svg     The logo mark (vector, traced from the supplied logo)
+assets/logo.svg     The ORIX logo mark (vector, traced from the supplied logo)
+assets/institute/   Adore Institute of Technology logo (transparent WebP, 1600 and 640 px wide)
+assets/products/    Product screenshots (Elements)
+assets/partners/    Partner logos for the marquee (white on transparent)
 assets/fonts/       Self-hosted Tinos (Times New Roman–compatible fallback, Apache 2.0)
 favicon.svg, apple-touch-icon.png, og-image.png, robots.txt
 screenshots/        Full-page screenshots of each page at 1440 / 768 / 390px
@@ -21,19 +24,21 @@ All copy lives in the `CONFIG` object at the top of `script.js`.
 
 | What | Where in `CONFIG` |
 | --- | --- |
-| Company name | `COMPANY_NAME` (used everywhere through the `{name}` token) |
+| Company name | `COMPANY_NAME` (currently "ORIX & Co.", which includes the full stop; used everywhere through the `{name}` token) |
+| Institute name | `INSTITUTE_NAME` (used as the logo's alt text and in titles via `{institute}`) |
 | Tagline | `TAGLINE` |
 | Contact email | `EMAIL` |
 | Placement wording | `PLACEMENT_CLAIM`, `PLACEMENT_NOTE` |
 | Page titles and descriptions | `meta.home`, `meta.products`, `meta.institute` |
 | Home stats and partners strip | `home.about.stats`, `home.partners.items` |
-| Products | `products.items` (name, description, tags, status, href, visual) |
+| Products | `products.items` (name, description, tags, status, href, visual or image, downloads) |
+| Download cards | `products.platforms` (Windows / Linux / macOS labels, notes, file names) and each product's `downloads` links |
 | Programs and steps | `institute.programs.items`, `institute.steps.items` |
 
 - Inside any string, `{name}`, `{tagline}`, `{placement}`, `{email}` and `{year}` are replaced automatically.
 - In a "statement", wrap one word in `*asterisks*` to make it the red italic accent.
 - An `&` in the company name is always rendered as the red italic ampersand in the hero and footer.
-- `home.partners.items` currently holds **placeholders**. Replace them with real clients, partners, hackathons or platforms you have actually worked with. If you leave the list empty, the strip is hidden.
+- `home.partners.items` holds the partner logos (MIT India and MIT Institute of Design). To add one, put a white-on-transparent PNG in `assets/partners/` and add `{ name, logo, width, height }`. Plain text names also work. If you leave the list empty, the strip is hidden.
 - `PLACEMENT_CLAIM` defaults to "Dedicated placement support". Do not change it to a guarantee without legal advice.
 
 ### Renaming the company: one extra step
@@ -48,6 +53,11 @@ The HTML holds the default copy as a fallback for visitors without JS and for se
 - Edit the `:root` variables in `style.css`. `--red` (#CC111A) and `--red-deep` (#A30C14) are sampled from the logo.
 - Type: `"Times New Roman", Tinos, Times, serif`. Macs and Windows PCs use their built-in Times New Roman. Other devices get the self-hosted Tinos files in `assets/fonts/`.
 - The logo appears inline in the header, the home hero, the footer and the 404 page, and is also drawn as a faint outline behind each page's hero. `assets/logo.svg` is the standalone file. The favicon and `apple-touch-icon.png` use the same mark.
+
+### Product screenshots and downloads
+
+- Give a product an `image: { src, srcSmall, alt, width, height }` to show a real screenshot (as Elements does). Otherwise it shows its abstract `visual`.
+- Every product with a `downloads` object gets three cards: Windows, Linux and macOS. Replace the `"#"` links with real installer URLs.
 
 ### Swapping in real product visuals
 

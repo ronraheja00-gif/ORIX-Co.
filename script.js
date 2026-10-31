@@ -64,20 +64,32 @@ const CONFIG = {
         { value: "3", label: "Flagship products" },
       ],
     },
-    institute: {
-      label: "The Institute",
-      cta: "Enter the Institute",
-      href: "institute.html",
+    showcase: {
+      label: "Products",
+      title: "Three products. Hover to look closer.",
+      cta: "View all products",
+      href: "products.html",
     },
     partners: {
-      label: "In good company",
+      label: "Participated under",
       // Only list real clients, partners, hackathons or platforms you have
       // actually worked with. Each item is either plain text ("Name") or a logo:
       //   { name, logo: "assets/partners/file.png", width, height }
       // Logos should be white on a transparent background (they sit on black).
+      // `layers`: how many rows. Items are dealt across rows in order; alternate rows scroll the other way.
+      layers: 2,
       items: [
         { name: "MIT India — Maharashtra Institute of Technology", logo: "assets/partners/mit-india.png", width: 402, height: 120 },
+        { name: "Jio Institute", logo: "assets/partners/jio-institute.png", width: 549, height: 120 },
         { name: "MIT Institute of Design", logo: "assets/partners/mit-institute-of-design.png", width: 375, height: 120 },
+        { name: "AIMA Index 2025 — Investment Maha Kumbh", logo: "assets/partners/aima-index-2025.png", width: 331, height: 120 },
+        { name: "Avantika University", logo: "assets/partners/avantika-university.png", width: 515, height: 120 },
+        { name: "MIT University, Shillong", logo: "assets/partners/mit-university-shillong.png", width: 147, height: 120 },
+        { name: "MIT Academy of Engineering", logo: "assets/partners/mit-academy-of-engineering.png", width: 515, height: 120 },
+        { name: "Edugild", logo: "assets/partners/edugild.png", width: 406, height: 120 },
+        { name: "MIT Arts, Commerce & Science College", logo: "assets/partners/mit-acs-college.png", width: 724, height: 120 },
+        { name: "Vishwashanti Gurukul World School", logo: "assets/partners/vishwashanti-gurukul.png", width: 578, height: 120 },
+        { name: "MIT School of Distance Education", logo: "assets/partners/mit-school-of-distance-education.png", width: 480, height: 120 },
       ],
       speed: 36, // pixels per second — lower is slower
     },
@@ -485,6 +497,41 @@ const CONFIG = {
       );
     },
 
+    showcase(el) {
+      const P = C.products;
+      const S = C.home.showcase;
+      el.replaceChildren(
+        ...P.items.map((p, i) => {
+          const id = p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+          const name = tpl(p.name);
+          return h("li", { "data-reveal": "", style: `--d:${i * 110}ms` }, [
+            h("a", { class: "showcase__row", href: `${S.href}#${id}` }, [
+              h("span", { class: "showcase__num eyebrow", text: String(i + 1).padStart(2, "0") }),
+              h("span", { class: "showcase__name", text: name }),
+              h("span", { class: "showcase__meta" }, [
+                h("span", { class: "eyebrow", text: tpl(p.status) }),
+                h("span", { class: "showcase__go" }, [arrow()]),
+              ]),
+            ]),
+          ]);
+        })
+      );
+      const preview = doc.querySelector("[data-showcase-preview]");
+      if (preview) {
+        preview.replaceChildren(
+          ...P.items.map((p) => {
+            const kind = p.image ? "image" : p.visual || "chevron";
+            const inner = p.image
+              ? [h("img", { src: p.image.srcSmall || p.image.src, alt: "", width: 800, height: 450, loading: "lazy", decoding: "async" })]
+              : VISUALS[kind]
+              ? [VISUALS[kind]()]
+              : [h("span", { class: "visual__a" }), h("span", { class: "visual__b" }), h("span", { class: "visual__c" })];
+            return h("div", { class: `showcase__frame visual visual--${kind}` }, inner);
+          })
+        );
+      }
+    },
+
     programs(el) {
       el.replaceChildren(
         ...C.institute.programs.items.map((p, i) =>
@@ -634,18 +681,21 @@ const CONFIG = {
     );
   }
 
-  /* ---------- partners marquee ---------- */
+  /* ---------- partners marquee (one or more rows) ---------- */
   function initMarquee() {
-    const marquee = doc.querySelector("[data-marquee]");
-    if (!marquee) return;
-    const track = marquee.querySelector(".marquee__track");
-    const items = C.home.partners.items.map((it) => (typeof it === "string" ? { name: tpl(it) } : { ...it, name: tpl(it.name) }));
-    if (!items.length) {
-      marquee.closest("section").hidden = true;
+    const host = doc.querySelector("[data-marquees]");
+    if (!host) return;
+    const P = C.home.partners;
+    const all = P.items.map((it) => (typeof it === "string" ? { name: tpl(it) } : { ...it, name: tpl(it.name) }));
+    if (!all.length) {
+      host.closest("section").hidden = true;
       return;
     }
+    const layers = Math.max(1, Math.min(P.layers || 1, all.length));
+    const rows = Array.from({ length: layers }, () => []);
+    all.forEach((it, i) => rows[i % layers].push(it));
 
-    const makeGroup = (repeat, hidden) => {
+    const makeGroup = (items, repeat, hidden) => {
       const ul = h("ul", { class: "marquee__group" });
       if (hidden) ul.setAttribute("aria-hidden", "true");
       for (let r = 0; r < repeat; r++) {
@@ -663,21 +713,30 @@ const CONFIG = {
       return ul;
     };
 
-    const build = () => {
-      track.replaceChildren(makeGroup(1, false));
+    const marquees = rows.map((items, i) => {
+      const track = h("div", { class: "marquee__track" });
+      const m = h("div", { class: "marquee" + (i % 2 ? " marquee--reverse" : "") }, [track]);
+      host.append(m);
+      return { m, track, items, speed: (P.speed || 36) * (i % 2 ? 0.85 : 1) };
+    });
+
+    const buildOne = ({ m, track, items, speed }) => {
+      track.replaceChildren(makeGroup(items, 1, false));
       if (reduceMotion.matches) {
-        marquee.classList.add("is-static");
+        m.classList.add("is-static");
+        m.classList.remove("is-running");
         return;
       }
-      marquee.classList.remove("is-static");
+      m.classList.remove("is-static");
       const single = track.firstChild.getBoundingClientRect().width || 1;
-      const repeat = Math.max(1, Math.ceil((marquee.clientWidth * 1.1) / single));
-      const group = makeGroup(repeat, false);
-      track.replaceChildren(group, makeGroup(repeat, true));
+      const repeat = Math.max(1, Math.ceil((m.clientWidth * 1.1) / single));
+      const group = makeGroup(items, repeat, false);
+      track.replaceChildren(group, makeGroup(items, repeat, true));
       const width = group.getBoundingClientRect().width;
-      track.style.setProperty("--marquee-duration", `${(width / (C.home.partners.speed || 36)).toFixed(1)}s`);
-      marquee.classList.add("is-running");
+      track.style.setProperty("--marquee-duration", `${(width / speed).toFixed(1)}s`);
+      m.classList.add("is-running");
     };
+    const build = () => marquees.forEach(buildOne);
 
     const ready = doc.fonts && doc.fonts.ready ? doc.fonts.ready : Promise.resolve();
     ready.then(build);
@@ -690,6 +749,62 @@ const CONFIG = {
       t = setTimeout(build, 200);
     });
     reduceMotion.addEventListener("change", build);
+  }
+
+  /* ---------- home: product showcase (hover reveal + cursor-following preview) ---------- */
+  function initShowcase() {
+    const list = doc.querySelector("[data-showcase]");
+    const preview = doc.querySelector("[data-showcase-preview]");
+    if (!list || !preview) return;
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const frames = [...preview.children];
+    let x = 0, y = 0, tx = 0, ty = 0, rot = 0, visible = false, raf = 0;
+
+    const loop = () => {
+      const k = reduceMotion.matches ? 1 : 0.14;
+      const dx = tx - x;
+      x += dx * k;
+      y += (ty - y) * k;
+      rot += (Math.max(-9, Math.min(9, dx * 0.08)) - rot) * 0.12;
+      preview.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${reduceMotion.matches ? 0 : rot.toFixed(2)}deg)`;
+      raf = visible || Math.abs(dx) > 0.5 ? requestAnimationFrame(loop) : 0;
+    };
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(loop);
+    };
+
+    list.addEventListener("pointermove", (e) => {
+      if (!finePointer.matches) return;
+      tx = e.clientX;
+      ty = e.clientY;
+      if (!visible) {
+        x = tx;
+        y = ty;
+      }
+      kick();
+    });
+    list.querySelectorAll(".showcase__row").forEach((row, i) => {
+      row.addEventListener("pointerenter", () => {
+        if (!finePointer.matches) return;
+        frames.forEach((f, j) => f.classList.toggle("is-active", j === i));
+        list.classList.add("is-hovering");
+        preview.classList.add("is-visible");
+        visible = true;
+        kick();
+      });
+    });
+    list.addEventListener("pointerleave", () => {
+      list.classList.remove("is-hovering");
+      preview.classList.remove("is-visible");
+      visible = false;
+    });
+  }
+
+  // Products are rendered by script, so jump to #product links after rendering.
+  function scrollToHash() {
+    if (!location.hash) return;
+    const target = doc.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (target) requestAnimationFrame(() => target.scrollIntoView({ block: "start" }));
   }
 
   /* ---------- enquiry form (front-end only) ---------- */
@@ -759,5 +874,7 @@ const CONFIG = {
   initReveal();
   initParallax();
   initMarquee();
+  initShowcase();
   initForm();
+  scrollToHash();
 })();

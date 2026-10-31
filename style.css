@@ -576,6 +576,7 @@ svg { display: block; }
 }
 
 /* ---------- Marquee ---------- */
+.showcase + .band { border-top: 1px solid var(--hair-dark); }
 .band {
   padding-block: clamp(72px, 8vw, 120px);
   background: var(--ink);
@@ -604,6 +605,8 @@ svg { display: block; }
 .marquee:hover .marquee__track,
 .marquee:focus-within .marquee__track { animation-play-state: paused; }
 
+.marquees { display: grid; gap: clamp(20px, 2.6vw, 36px); }
+.marquee--reverse.is-running .marquee__track { animation-direction: reverse; }
 .marquee__group { display: flex; flex: none; }
 .marquee__item {
   display: flex;
@@ -655,7 +658,7 @@ svg { display: block; }
 }
 
 /* ---------- Products ---------- */
-.product { border-top: 1px solid var(--hair); padding-block: var(--section); }
+.product { border-top: 1px solid var(--hair); padding-block: var(--section); scroll-margin-top: 40px; }
 .product:last-child { border-bottom: 1px solid var(--hair); }
 .product__grid { align-items: center; row-gap: 48px; }
 .product__visual { grid-column: 1 / span 7; grid-row: 1; }
@@ -1097,30 +1100,118 @@ svg { display: block; }
 }
 .footer__bottom .eyebrow { font-size: 11px; }
 
-/* ---------- Home: institute teaser ---------- */
-.teaser .eyebrow { margin-bottom: clamp(40px, 5vw, 64px); }
-.logo-button {
+/* ---------- Home: product showcase (the hook) ---------- */
+.showcase {
+  position: relative;
+  padding-block: var(--section);
+  background: var(--ink);
+  color: var(--on-dark);
+  overflow: hidden;
+}
+.showcase::before {
+  /* a slow sweep of light across the band, at the logo's diagonal */
+  content: "";
+  position: absolute;
+  inset: -40% -20%;
+  pointer-events: none;
+  background: linear-gradient(218deg, transparent 40%, rgba(255, 255, 255, 0.045) 50%, transparent 60%);
+  animation: sweep 14s var(--ease-soft) infinite alternate;
+}
+@keyframes sweep {
+  from { transform: translateX(-18%); }
+  to { transform: translateX(18%); }
+}
+.showcase .eyebrow { color: var(--on-dark-mute); }
+.showcase__head {
+  position: relative;
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: clamp(40px, 6vw, 88px);
+}
+.cta--light { color: var(--on-dark); }
+
+.showcase__list { position: relative; border-bottom: 1px solid var(--hair-dark); }
+.showcase__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4em 1fr auto;
   align-items: center;
-  gap: clamp(32px, 4vw, 52px);
-  padding: clamp(40px, 6vw, 96px) clamp(20px, 5vw, 80px);
-  border: 1px solid var(--hair);
+  gap: var(--col-gap);
+  padding-block: clamp(14px, 2.2vw, 30px);
+  border-top: 1px solid var(--hair-dark);
   text-decoration: none;
-  color: var(--ink);
-  transition: border-color 0.6s var(--ease-soft), background-color 0.6s var(--ease-soft);
+  color: var(--on-dark);
+  outline-offset: -1px;
 }
-.logo-button .inst-logo {
-  width: min(760px, 100%);
-  transition: transform 1.2s var(--ease);
+.showcase__name {
+  font-size: clamp(3.2rem, 11.5vw, 11rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  /* outlined type that fills with white on hover */
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5);
+  background: linear-gradient(90deg, var(--white) 50%, transparent 50%) 100% 0 / 200% 100% no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  transition: background-position 1s var(--ease), transform 1s var(--ease), -webkit-text-stroke-color 0.6s;
 }
-.logo-button:hover,
-.logo-button:focus-visible { border-color: var(--hair-strong); background: rgba(255, 255, 255, 0.5); }
-.logo-button:hover .inst-logo { transform: scale(1.015); }
-.logo-button:hover .cta__text,
-.logo-button:focus-visible .cta__text { background-size: 100% 1px; }
-.logo-button:hover .arrow,
-.logo-button:focus-visible .arrow { transform: translateX(8px); color: var(--red); }
+.showcase__meta {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  opacity: 0.55;
+  transition: opacity 0.6s var(--ease-soft);
+}
+.showcase__go { display: inline-flex; color: var(--on-dark); }
+.showcase__go .arrow { width: 44px; height: 12px; }
+
+.showcase__row:hover .showcase__name,
+.showcase__row:focus-visible .showcase__name {
+  background-position: 0 0;
+  -webkit-text-stroke-color: var(--white);
+  transform: translateX(clamp(8px, 1.4vw, 24px));
+}
+.showcase__row:hover .showcase__meta,
+.showcase__row:focus-visible .showcase__meta { opacity: 1; }
+.showcase__row:hover .arrow,
+.showcase__row:focus-visible .arrow { color: var(--red); transform: translateX(10px); }
+.showcase__row:hover .showcase__num,
+.showcase__row:focus-visible .showcase__num { color: var(--red); }
+/* dim the other rows while one is hovered */
+.showcase__list.is-hovering .showcase__row:not(:hover) .showcase__name { -webkit-text-stroke-color: rgba(255, 255, 255, 0.22); }
+
+.showcase__preview {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  width: clamp(260px, 26vw, 420px);
+  aspect-ratio: 16 / 10;
+  margin: calc(clamp(260px, 26vw, 420px) * -0.3125) 0 0 calc(clamp(260px, 26vw, 420px) * -0.5);
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+.showcase__preview.is-visible { opacity: 1; }
+.showcase__frame {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+  border-radius: 18px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 40px 80px -30px rgba(0, 0, 0, 0.8);
+  clip-path: inset(50% 50% 50% 50% round 18px);
+  transition: clip-path 0.9s var(--ease);
+}
+.showcase__frame.is-active { clip-path: inset(0 0 0 0 round 18px); }
+.showcase__frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+@media (hover: none), (pointer: coarse) {
+  .showcase__preview { display: none; }
+  .showcase__name { color: var(--white); -webkit-text-stroke: 0; background: none; }
+}
 
 /* ---------- Institute page: navy & gold from its crest ---------- */
 body[data-page="institute"] main {
@@ -1201,6 +1292,11 @@ body[data-page="institute"] .button:hover .arrow { color: var(--red); }
   .stat + .stat { border-left: 0; }
 
   .form__row { grid-template-columns: 1fr; }
+
+  .showcase__row { grid-template-columns: 2.6em 1fr auto; }
+  .showcase__meta .eyebrow { display: none; }
+  .showcase__go .arrow { width: 32px; }
+  .showcase__head { flex-direction: column; gap: 20px; }
 
   .product__meta > div { grid-template-columns: 1fr; gap: 6px; }
 

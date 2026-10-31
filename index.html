@@ -95,23 +95,29 @@
       </div>
     </section>
 
-    <section class="section section--ivory teaser" aria-labelledby="teaser-title">
+    <section class="showcase" aria-labelledby="showcase-title">
       <div class="container">
-        <h2 class="eyebrow eyebrow--rule" id="teaser-title" data-c="home.institute.label" data-reveal>The Institute</h2>
-        <a class="logo-button" href="institute.html" data-href="home.institute.href" data-reveal style="--d:120ms">
-          <img class="inst-logo" src="assets/institute/adore-logo-1600.webp" srcset="assets/institute/adore-logo-640.webp 640w, assets/institute/adore-logo-1600.webp 1600w" sizes="(max-width: 860px) 90vw, 880px" alt="Adore Institute of Technology" data-alt="INSTITUTE_NAME" width="1600" height="408" decoding="async" loading="lazy">
-          <span class="cta"><span class="cta__text" data-c="home.institute.cta">Enter the Institute</span><svg class="arrow" viewBox="0 0 32 10" aria-hidden="true" focusable="false"><path d="M0 5h31M26.5 1 31 5l-4.5 4"/></svg></span>
-        </a>
+        <div class="showcase__head">
+          <h2 class="eyebrow eyebrow--rule" id="showcase-title" data-c="home.showcase.label" data-reveal>Products</h2>
+          <a class="cta cta--light" href="products.html" data-href="home.showcase.href" data-reveal style="--d:120ms">
+            <span class="cta__text" data-c="home.showcase.cta">View all products</span>
+            <svg class="arrow" viewBox="0 0 32 10" aria-hidden="true" focusable="false"><path d="M0 5h31M26.5 1 31 5l-4.5 4"/></svg>
+          </a>
+        </div>
+        <ol class="showcase__list" data-showcase data-render="showcase">
+          <li><a class="showcase__row" href="products.html#elements"><span class="showcase__name">Elements</span></a></li>
+          <li><a class="showcase__row" href="products.html#netherite"><span class="showcase__name">Netherite</span></a></li>
+          <li><a class="showcase__row" href="products.html#phantom"><span class="showcase__name">Phantom</span></a></li>
+        </ol>
       </div>
+      <div class="showcase__preview" data-showcase-preview aria-hidden="true"></div>
     </section>
 
     <section class="band" aria-labelledby="partners-title">
       <div class="band__label">
-        <h2 class="eyebrow" id="partners-title" data-c="home.partners.label">In good company</h2>
+        <h2 class="eyebrow" id="partners-title" data-c="home.partners.label">Participated under</h2>
       </div>
-      <div class="marquee" data-marquee>
-        <div class="marquee__track"></div>
-      </div>
+      <div class="marquees" data-marquees></div>
     </section>
   </main>
 

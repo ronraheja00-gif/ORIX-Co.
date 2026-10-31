@@ -30,7 +30,7 @@ All copy lives in the `CONFIG` object at the top of `script.js`.
 | Contact email | `EMAIL` |
 | Placement wording | `PLACEMENT_CLAIM`, `PLACEMENT_NOTE` |
 | Page titles and descriptions | `meta.home`, `meta.products`, `meta.institute` |
-| Home stats and partners strip | `home.about.stats`, `home.partners.items` |
+| Home stats, product showcase, partners strip | `home.about.stats`, `home.showcase`, `home.partners` |
 | Products | `products.items` (name, description, tags, status, href, visual or image, downloads) |
 | Download cards | `products.platforms` (Windows / Linux / macOS labels, notes, file names) and each product's `downloads` links |
 | Programs and steps | `institute.programs.items`, `institute.steps.items` |
@@ -38,7 +38,8 @@ All copy lives in the `CONFIG` object at the top of `script.js`.
 - Inside any string, `{name}`, `{tagline}`, `{placement}`, `{email}` and `{year}` are replaced automatically.
 - In a "statement", wrap one word in `*asterisks*` to make it the red italic accent.
 - An `&` in the company name is always rendered as the red italic ampersand in the hero and footer.
-- `home.partners.items` holds the partner logos (MIT India and MIT Institute of Design). To add one, put a white-on-transparent PNG in `assets/partners/` and add `{ name, logo, width, height }`. Plain text names also work. If you leave the list empty, the strip is hidden.
+- `home.partners` drives the "Participated under" strip: 11 logos, dealt across `layers` rows (2 by default), with alternate rows scrolling the other way. To add one, put a white-on-transparent PNG in `assets/partners/` and add `{ name, logo, width, height }` to `items`. Plain text names also work. If you leave the list empty, the strip is hidden.
+- `home.showcase` holds the labels for the home page's product showcase. The rows themselves come from `products.items`, and each links to its product on `products.html`.
 - `PLACEMENT_CLAIM` defaults to "Dedicated placement support". Do not change it to a guarantee without legal advice.
 
 ### Renaming the company: one extra step

@@ -843,71 +843,124 @@ const CONFIG = {
       title.classList.add("is-split");
     }
 
-    initTorch();
+    initLiquid();
   }
 
-  /* ---------- hero: the watermark is lit by a liquid "torch" that trails the cursor ----------
-     Three soft pools of light follow the pointer at different speeds and gently pulse, so the lit
-     area stretches and wobbles like a fluid. With no pointer in the hero (or on touch), it drifts. */
-  function initTorch() {
+  /* ---------- hero: liquid reveal ----------
+     A dark "night" copy of the hero sits on top, clipped to a liquid blob that trails the cursor.
+     The blob is a chain of circles joined by tangent bridges, so its outline is smooth like a fluid;
+     the trail shrinks away behind the pointer and every point wobbles a little. */
+  function initLiquid() {
     const hero = doc.querySelector("[data-spot]");
-    const mark = doc.querySelector("[data-torch]");
-    if (!hero || !mark || reduceMotion.matches) return;
-    hero.classList.add("has-torch");
+    if (!hero || reduceMotion.matches) return;
+
+    // Build the night layer from the hero itself so the two always line up.
+    const ink = hero.cloneNode(true);
+    ink.className = "hero hero--home hero--ink";
+    ["data-spot", "aria-labelledby"].forEach((a) => ink.removeAttribute(a));
+    ink.setAttribute("aria-hidden", "true");
+    ink.setAttribute("inert", "");
+    ink.querySelectorAll(".hero__light, .hero__spot").forEach((el) => el.remove());
+    ink.querySelectorAll("[id], [aria-label], [data-parallax], [data-torch], [data-split]").forEach((el) => {
+      ["id", "aria-label", "data-parallax", "data-torch", "data-split"].forEach((a) => el.removeAttribute(a));
+    });
+    ink.querySelectorAll(".hero__trace--torch").forEach((el) => el.classList.remove("hero__trace--torch"));
+    hero.append(ink);
 
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const blobs = [
-      { k: 0.16, r: 210, x: 0, y: 0 },
-      { k: 0.08, r: 150, x: 0, y: 0 },
-      { k: 0.045, r: 110, x: 0, y: 0 },
-    ];
-    let px = 0, py = 0, pointerIn = false, raf = 0, visible = true, started = false;
-    const t0 = performance.now();
+    const trail = []; // { x, y, r, life, seed } in hero coordinates
+    let cx = 0, cy = 0, inside = false, head = 0, last = null, raf = 0, visible = true, prev = performance.now();
+    const baseR = () => Math.max(60, Math.min(130, hero.clientWidth * 0.085));
+
+    const addPoint = (x, y) => {
+      if (last) {
+        const dx = x - last.x, dy = y - last.y, d = Math.hypot(dx, dy);
+        const steps = Math.min(12, Math.floor(d / 14));
+        for (let i = 1; i <= steps; i++) {
+          trail.push({ x: last.x + (dx * i) / (steps + 1), y: last.y + (dy * i) / (steps + 1), life: 1, seed: Math.random() * 6.28 });
+        }
+      }
+      trail.push({ x, y, life: 1, seed: Math.random() * 6.28 });
+      last = { x, y };
+      if (trail.length > 140) trail.splice(0, trail.length - 140);
+    };
 
     hero.addEventListener("pointermove", (e) => {
       if (!finePointer.matches) return;
-      pointerIn = true;
-      px = e.clientX;
-      py = e.clientY;
+      const r = hero.getBoundingClientRect();
+      cx = e.clientX - r.left;
+      cy = e.clientY - r.top;
+      if (!inside) last = null;
+      inside = true;
+      addPoint(cx, cy);
+      kick();
     });
-    hero.addEventListener("pointerleave", () => (pointerIn = false));
+    hero.addEventListener("pointerleave", () => {
+      inside = false;
+      last = null;
+    });
 
-    const frame = (now) => {
-      const t = (now - t0) / 1000;
-      const mr = mark.getBoundingClientRect();
-      const hr = hero.getBoundingClientRect();
-      // target in the watermark's own coordinates
-      let tx, ty;
-      if (pointerIn) {
-        tx = px - mr.left;
-        ty = py - mr.top;
-      } else {
-        tx = mr.width * (0.5 + 0.32 * Math.sin(t * 0.21));
-        ty = mr.height * (0.45 + 0.26 * Math.sin(t * 0.33 + 1.2));
-      }
-      if (!started) {
-        blobs.forEach((b) => ((b.x = tx), (b.y = ty)));
-        started = true;
-      }
-      blobs.forEach((b, i) => {
-        b.x += (tx - b.x) * b.k;
-        b.y += (ty - b.y) * b.k;
-        const pulse = 1 + 0.12 * Math.sin(t * (1.1 + i * 0.37) + i * 2.1);
-        mark.style.setProperty(`--b${i}x`, b.x.toFixed(1) + "px");
-        mark.style.setProperty(`--b${i}y`, b.y.toFixed(1) + "px");
-        mark.style.setProperty(`--b${i}r`, (b.r * pulse).toFixed(1) + "px");
-      });
-      // the warm light follows the lead pool
-      const lead = blobs[0];
-      hero.style.setProperty("--mx", (((lead.x + mr.left - hr.left) / hr.width) * 100).toFixed(2) + "%");
-      hero.style.setProperty("--my", (((lead.y + mr.top - hr.top) / hr.height) * 100).toFixed(2) + "%");
-      raf = visible ? requestAnimationFrame(frame) : 0;
+    const circle = (x, y, r) =>
+      `M${(x + r).toFixed(1)} ${y.toFixed(1)}A${r.toFixed(1)} ${r.toFixed(1)} 0 1 1 ${(x - r).toFixed(1)} ${y.toFixed(1)}A${r.toFixed(1)} ${r.toFixed(1)} 0 1 1 ${(x + r).toFixed(1)} ${y.toFixed(1)}Z`;
+    const bridge = (a, b) => {
+      const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy);
+      if (d < 0.5 || d <= Math.abs(a.r - b.r)) return "";
+      const base = Math.atan2(dy, dx), phi = Math.acos((a.r - b.r) / d);
+      const p = [
+        [a.x + a.r * Math.cos(base + phi), a.y + a.r * Math.sin(base + phi)],
+        [b.x + b.r * Math.cos(base + phi), b.y + b.r * Math.sin(base + phi)],
+        [b.x + b.r * Math.cos(base - phi), b.y + b.r * Math.sin(base - phi)],
+        [a.x + a.r * Math.cos(base - phi), a.y + a.r * Math.sin(base - phi)],
+      ];
+      // keep every sub-path wound the same way as the circles so the union fills cleanly
+      let area = 0;
+      for (let i = 0; i < 4; i++) area += p[i][0] * p[(i + 1) % 4][1] - p[(i + 1) % 4][0] * p[i][1];
+      if (area < 0) p.reverse();
+      return "M" + p.map((q) => q[0].toFixed(1) + " " + q[1].toFixed(1)).join("L") + "Z";
     };
 
-    // only animate while the hero is on screen
+    const frame = (now) => {
+      const dt = Math.min(0.05, (now - prev) / 1000);
+      prev = now;
+      const t = now / 1000;
+      const R = baseR();
+      head += ((inside ? 1 : 0) - head) * (inside ? 0.12 : 0.08);
+
+      for (let i = trail.length - 1; i >= 0; i--) {
+        trail[i].life -= dt / 1.4;
+        if (trail[i].life <= 0) trail.splice(i, 1);
+      }
+      const pts = trail.map((p) => {
+        const e = 1 - Math.pow(1 - p.life, 2.2); // stays thick, then tapers off at the end
+        return { x: p.x, y: p.y, r: R * 0.95 * e * (1 + 0.09 * Math.sin(t * 3.1 + p.seed)) };
+      });
+      if (head > 0.01 && last) pts.push({ x: cx, y: cy, r: R * head * (1 + 0.05 * Math.sin(t * 2.3)) });
+
+      let d = "";
+      for (let i = 0; i < pts.length; i++) {
+        if (pts[i].r < 1) continue;
+        d += circle(pts[i].x, pts[i].y, pts[i].r);
+        if (i > 0 && pts[i - 1].r >= 1) d += bridge(pts[i - 1], pts[i]);
+      }
+      ink.style.clipPath = d ? `path("${d}")` : "inset(50%)";
+
+      if (inside) {
+        hero.style.setProperty("--mx", ((cx / hero.clientWidth) * 100).toFixed(2) + "%");
+        hero.style.setProperty("--my", ((cy / hero.clientHeight) * 100).toFixed(2) + "%");
+      }
+      const busy = visible && (inside || trail.length || head > 0.01);
+      raf = busy ? requestAnimationFrame(frame) : 0;
+    };
+    const kick = () => {
+      if (!raf && visible) {
+        prev = performance.now();
+        raf = requestAnimationFrame(frame);
+      }
+    };
+
     new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-      if (visible && !raf) raf = requestAnimationFrame(frame);
+      if (visible) kick();
     }).observe(hero);
   }
 

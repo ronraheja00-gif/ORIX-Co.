@@ -106,4 +106,4 @@ Once you know the domain, make `og:image` / `twitter:image` absolute URLs (for e
 
 - Semantic landmarks, a skip link, visible red focus outlines, labelled form fields with live error messages, and `aria-current` on the current nav link.
 - The mobile menu closes on Escape and makes the page behind it inert.
-- `prefers-reduced-motion` turns off the reveal animations, the parallax and the marquee scrolling (the partners are shown as a static centred list instead). With reduced motion, the hero watermark is shown as a static faint outline instead of the cursor-following light.
+- `prefers-reduced-motion` turns off the reveal animations, the parallax and the marquee scrolling (the partners are shown as a static centred list instead). With reduced motion, the hero's liquid reveal is switched off.

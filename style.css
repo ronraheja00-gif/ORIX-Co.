@@ -467,22 +467,34 @@ svg { display: block; }
 }
 .hero__trace--wide path { stroke: rgba(10, 10, 10, 0.07); }
 
-/* Torch: the watermark only shows where the liquid light falls (set up by script). */
-.has-torch .hero__trace--torch {
-  -webkit-mask-image:
-    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
-    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
-    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
-  mask-image:
-    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
-    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
-    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+/* ---------- Hero liquid reveal: the "night" layer shown inside the cursor's liquid trail ---------- */
+.hero--ink {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  min-height: 0;
+  height: 100%;
+  pointer-events: none;
+  clip-path: inset(50%);
+  color: var(--ivory);
+  background:
+    radial-gradient(70% 60% at 50% 38%, #1B1918 0%, var(--ink) 75%);
 }
-/* lit lines are crisper and the fill glows a little */
-.has-torch .hero__trace--torch path { stroke: rgba(10, 10, 10, 0.3); }
-.has-torch .hero__trace--torch .trace-fill { fill: rgba(255, 255, 255, 0.9); }
+/* everything in the night layer is already "revealed" */
+.js .hero--ink [data-reveal] { opacity: 1; transform: none; transition: none; }
+.hero--ink .hero__title { color: var(--ivory); }
+.hero--ink .hero__sub,
+.hero--ink .eyebrow { color: rgba(255, 255, 255, 0.62); }
+.hero--ink .cta { color: var(--white); }
+.hero--ink .hero__bar { border-top-color: var(--hair-dark); }
+.hero--ink .hero__products a,
+.hero--ink .hero__side { color: rgba(255, 255, 255, 0.72); }
+.hero--ink .scroll-cue { color: rgba(255, 255, 255, 0.5); }
+.hero--ink .scroll-cue__line { background: var(--hair-dark); }
+.hero--ink .scroll-cue__line::after { background: var(--white); }
+/* the hidden watermark, drawn in fine red lines */
+.hero--ink .hero__trace path { stroke: rgba(225, 30, 36, 0.75); }
+.hero--ink .hero__trace .trace-fill { fill: rgba(225, 30, 36, 0.04); stroke: none; }
 .hero--intro .hero__trace {
   left: auto;
   right: var(--gutter);
@@ -1474,22 +1486,7 @@ body[data-page="institute"] .button:hover .arrow { color: var(--red); }
 }
 .hero__trace--wide path { stroke: rgba(10, 10, 10, 0.07); }
 
-/* Torch: the watermark only shows where the liquid light falls (set up by script). */
-.has-torch .hero__trace--torch {
-  -webkit-mask-image:
-    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
-    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
-    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
-  mask-image:
-    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
-    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
-    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-}
-/* lit lines are crisper and the fill glows a little */
-.has-torch .hero__trace--torch path { stroke: rgba(10, 10, 10, 0.3); }
-.has-torch .hero__trace--torch .trace-fill { fill: rgba(255, 255, 255, 0.9); }
+
 .hero--intro .hero__trace { opacity: 0.6; }
 }
 
@@ -1522,22 +1519,7 @@ body[data-page="institute"] .button:hover .arrow { color: var(--red); }
 }
 .hero__trace--wide path { stroke: rgba(10, 10, 10, 0.07); }
 
-/* Torch: the watermark only shows where the liquid light falls (set up by script). */
-.has-torch .hero__trace--torch {
-  -webkit-mask-image:
-    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
-    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
-    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
-  mask-image:
-    radial-gradient(circle var(--b0r, 0px) at var(--b0x, -999px) var(--b0y, -999px), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 100%),
-    radial-gradient(circle var(--b1r, 0px) at var(--b1x, -999px) var(--b1y, -999px), #000 0%, rgba(0, 0, 0, 0.45) 45%, transparent 100%),
-    radial-gradient(circle var(--b2r, 0px) at var(--b2x, -999px) var(--b2y, -999px), #000 0%, rgba(0, 0, 0, 0.4) 45%, transparent 100%);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-}
-/* lit lines are crisper and the fill glows a little */
-.has-torch .hero__trace--torch path { stroke: rgba(10, 10, 10, 0.3); }
-.has-torch .hero__trace--torch .trace-fill { fill: rgba(255, 255, 255, 0.9); }
+
 .hero--intro .hero__trace { right: -60px; height: 58%; }
 }
 

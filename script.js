@@ -52,6 +52,8 @@ const CONFIG = {
       cta: "Explore our products",
       ctaHref: "products.html",
       scroll: "Scroll",
+      // Bottom bar of the hero: product names on the left (from products.items), this link on the right.
+      sideLink: { label: "{institute}", href: "institute.html" },
     },
     about: {
       label: "About",
@@ -66,7 +68,7 @@ const CONFIG = {
     },
     showcase: {
       label: "Products",
-      title: "Three products. Hover to look closer.",
+      title: "Three products. Meet the mascot.",
       cta: "View all products",
       href: "products.html",
     },
@@ -75,14 +77,14 @@ const CONFIG = {
       // Only list real clients, partners, hackathons or platforms you have
       // actually worked with. Each item is either plain text ("Name") or a logo:
       //   { name, logo: "assets/partners/file.png", width, height }
-      // Logos should be white on a transparent background (they sit on black).
+      // Logos are full-colour PNGs on a transparent background.
       // `layers`: how many rows. Items are dealt across rows in order; alternate rows scroll the other way.
       layers: 2,
       items: [
         { name: "MIT India — Maharashtra Institute of Technology", logo: "assets/partners/mit-india.png", width: 402, height: 120 },
         { name: "Jio Institute", logo: "assets/partners/jio-institute.png", width: 549, height: 120 },
         { name: "MIT Institute of Design", logo: "assets/partners/mit-institute-of-design.png", width: 375, height: 120 },
-        { name: "AIMA Index 2025 — Investment Maha Kumbh", logo: "assets/partners/aima-index-2025.png", width: 331, height: 120 },
+        { name: "AIMA Index 2025 — Investment Maha Kumbh", logo: "assets/partners/aima-index-2025.png", width: 320, height: 120 },
         { name: "Avantika University", logo: "assets/partners/avantika-university.png", width: 515, height: 120 },
         { name: "MIT University, Shillong", logo: "assets/partners/mit-university-shillong.png", width: 147, height: 120 },
         { name: "MIT Academy of Engineering", logo: "assets/partners/mit-academy-of-engineering.png", width: 515, height: 120 },
@@ -497,6 +499,15 @@ const CONFIG = {
       );
     },
 
+    "hero-products"(el) {
+      el.replaceChildren(
+        ...C.products.items.map((p) => {
+          const id = p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+          return h("li", null, [h("a", { class: "link", href: `products.html#${id}`, text: tpl(p.name) })]);
+        })
+      );
+    },
+
     showcase(el) {
       const P = C.products;
       const S = C.home.showcase;
@@ -516,20 +527,6 @@ const CONFIG = {
           ]);
         })
       );
-      const preview = doc.querySelector("[data-showcase-preview]");
-      if (preview) {
-        preview.replaceChildren(
-          ...P.items.map((p) => {
-            const kind = p.image ? "image" : p.visual || "chevron";
-            const inner = p.image
-              ? [h("img", { src: p.image.srcSmall || p.image.src, alt: "", width: 800, height: 450, loading: "lazy", decoding: "async" })]
-              : VISUALS[kind]
-              ? [VISUALS[kind]()]
-              : [h("span", { class: "visual__a" }), h("span", { class: "visual__b" }), h("span", { class: "visual__c" })];
-            return h("div", { class: `showcase__frame visual visual--${kind}` }, inner);
-          })
-        );
-      }
     },
 
     programs(el) {
@@ -751,52 +748,107 @@ const CONFIG = {
     reduceMotion.addEventListener("change", build);
   }
 
-  /* ---------- home: product showcase (hover reveal + cursor-following preview) ---------- */
+  /* ---------- home: product showcase — the mascot becomes the cursor ---------- */
   function initShowcase() {
-    const list = doc.querySelector("[data-showcase]");
-    const preview = doc.querySelector("[data-showcase-preview]");
-    if (!list || !preview) return;
+    const section = doc.querySelector(".showcase");
+    const mascot = doc.querySelector("[data-mascot]");
+    if (!section || !mascot) return;
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const frames = [...preview.children];
-    let x = 0, y = 0, tx = 0, ty = 0, rot = 0, visible = false, raf = 0;
+    let x = -200, y = -200, tx = -200, ty = -200, rot = 0, scale = 1, ts = 1, inside = false, raf = 0;
 
     const loop = () => {
-      const k = reduceMotion.matches ? 1 : 0.14;
+      const still = reduceMotion.matches;
       const dx = tx - x;
-      x += dx * k;
-      y += (ty - y) * k;
-      rot += (Math.max(-9, Math.min(9, dx * 0.08)) - rot) * 0.12;
-      preview.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${reduceMotion.matches ? 0 : rot.toFixed(2)}deg)`;
-      raf = visible || Math.abs(dx) > 0.5 ? requestAnimationFrame(loop) : 0;
+      x += dx * (still ? 1 : 0.45);
+      y += (ty - y) * (still ? 1 : 0.45);
+      scale += (ts - scale) * (still ? 1 : 0.16);
+      rot += ((still ? 0 : Math.max(-8, Math.min(8, dx * 0.6))) - rot) * 0.15;
+      mascot.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
+      const busy = inside || Math.abs(dx) > 0.3 || Math.abs(ts - scale) > 0.002 || Math.abs(rot) > 0.05;
+      raf = busy ? requestAnimationFrame(loop) : 0;
     };
     const kick = () => {
       if (!raf) raf = requestAnimationFrame(loop);
     };
 
-    list.addEventListener("pointermove", (e) => {
-      if (!finePointer.matches) return;
-      tx = e.clientX;
-      ty = e.clientY;
-      if (!visible) {
-        x = tx;
-        y = ty;
-      }
+    section.addEventListener("pointerenter", (e) => {
+      if (!finePointer.matches || e.pointerType !== "mouse") return;
+      inside = true;
+      x = tx = e.clientX;
+      y = ty = e.clientY;
+      section.classList.add("has-mascot");
+      mascot.classList.add("is-on");
       kick();
     });
-    list.querySelectorAll(".showcase__row").forEach((row, i) => {
+    section.addEventListener("pointermove", (e) => {
+      if (!inside) return;
+      tx = e.clientX;
+      ty = e.clientY;
+      kick();
+    });
+    section.addEventListener("pointerleave", () => {
+      inside = false;
+      section.classList.remove("has-mascot");
+      mascot.classList.remove("is-on", "is-hot");
+      ts = 1;
+    });
+    section.querySelectorAll(".showcase__row").forEach((row) => {
       row.addEventListener("pointerenter", () => {
-        if (!finePointer.matches) return;
-        frames.forEach((f, j) => f.classList.toggle("is-active", j === i));
-        list.classList.add("is-hovering");
-        preview.classList.add("is-visible");
-        visible = true;
+        ts = 1.15;
+        mascot.classList.add("is-hot");
+        section.querySelector(".showcase__list").classList.add("is-hovering");
+        kick();
+      });
+      row.addEventListener("pointerleave", () => {
+        ts = 1;
+        mascot.classList.remove("is-hot");
+        section.querySelector(".showcase__list").classList.remove("is-hovering");
         kick();
       });
     });
-    list.addEventListener("pointerleave", () => {
-      list.classList.remove("is-hovering");
-      preview.classList.remove("is-visible");
-      visible = false;
+  }
+
+  /* ---------- hero: title letters rise in, soft light follows the pointer ---------- */
+  function initHero() {
+    const title = doc.querySelector("[data-split]");
+    if (title && !reduceMotion.matches) {
+      let i = 0;
+      const wrap = (node) => {
+        [...node.childNodes].forEach((n) => {
+          if (n.nodeType === 3) {
+            const frag = doc.createDocumentFragment();
+            [...n.textContent].forEach((ch) => {
+              if (ch === " ") frag.append(" ");
+              else frag.append(h("span", { class: "char", style: `--i:${i++}`, text: ch }));
+            });
+            n.replaceWith(frag);
+          } else if (n.nodeType === 1) {
+            n.classList.add("char");
+            n.style.setProperty("--i", i++);
+          }
+        });
+      };
+      title.setAttribute("aria-label", title.textContent);
+      wrap(title);
+      [...title.children].forEach((c) => c.setAttribute("aria-hidden", "true"));
+      title.classList.add("is-split");
+    }
+
+    const hero = doc.querySelector("[data-spot]");
+    if (!hero || reduceMotion.matches) return;
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    let raf = 0, mx = 50, my = 40;
+    hero.addEventListener("pointermove", (e) => {
+      if (!finePointer.matches) return;
+      const r = hero.getBoundingClientRect();
+      mx = ((e.clientX - r.left) / r.width) * 100;
+      my = ((e.clientY - r.top) / r.height) * 100;
+      if (!raf)
+        raf = requestAnimationFrame(() => {
+          hero.style.setProperty("--mx", mx.toFixed(1) + "%");
+          hero.style.setProperty("--my", my.toFixed(1) + "%");
+          raf = 0;
+        });
     });
   }
 
@@ -875,6 +927,7 @@ const CONFIG = {
   initParallax();
   initMarquee();
   initShowcase();
+  initHero();
   initForm();
   scrollToHash();
 })();

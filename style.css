@@ -475,6 +475,44 @@ svg { display: block; }
 }
 .hero--inst .hero__sub { margin-top: clamp(32px, 4vw, 56px); }
 
+/* Home hero refinements */
+.hero__spot {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(38vmax 30vmax at var(--mx, 50%) var(--my, 38%), rgba(255, 255, 255, 0.85), transparent 70%);
+  transition: background-position 0.3s;
+}
+.hero__title.is-split .char {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 0.32em, 0);
+  animation: char-rise 1.6s var(--ease) forwards;
+  animation-delay: calc(var(--i) * 70ms + 250ms);
+}
+@keyframes char-rise {
+  to { opacity: 1; transform: none; }
+}
+.hero__bar {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 28px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hair);
+}
+.hero__products { display: flex; gap: 22px; justify-self: start; }
+.hero__products a { color: var(--ink-soft); }
+.hero__products a:hover { color: var(--ink); }
+.hero__side { justify-self: end; color: var(--ink-soft); }
+.hero__side:hover { color: var(--ink); }
+.hero__bar .scroll-cue { margin-right: 0; }
+
 .hero__mark {
   display: block;
   width: auto;
@@ -512,10 +550,6 @@ svg { display: block; }
 .hero__cta { margin-top: clamp(48px, 6vw, 80px); }
 
 .scroll-cue {
-  position: absolute;
-  left: 50%;
-  bottom: 32px;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -578,8 +612,9 @@ svg { display: block; }
 /* ---------- Marquee ---------- */
 .band {
   padding-block: clamp(72px, 8vw, 120px);
-  background: var(--ink);
-  color: var(--on-dark);
+  background: var(--white);
+  color: var(--ink);
+  border-top: 1px solid var(--hair);
   overflow: hidden;
 }
 .band__label {
@@ -617,7 +652,7 @@ svg { display: block; }
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--hair-strong);
   margin-inline: clamp(32px, 4.5vw, 72px);
 }
 .marquee__name {
@@ -632,10 +667,9 @@ svg { display: block; }
   display: block;
   width: auto;
   height: clamp(40px, 4.4vw, 60px);
-  opacity: 0.5;
-  transition: opacity 0.6s var(--ease-soft);
+  transition: transform 0.8s var(--ease);
 }
-.marquee__item:hover .marquee__logo { opacity: 1; }
+.marquee__item:hover .marquee__logo { transform: scale(1.06); }
 
 .marquee.is-static {
   -webkit-mask-image: none;
@@ -1182,33 +1216,39 @@ svg { display: block; }
 /* dim the other rows while one is hovered */
 .showcase__list.is-hovering .showcase__row:not(:hover) .showcase__name { -webkit-text-stroke-color: rgba(10, 10, 10, 0.16); }
 
-.showcase__preview {
+/* The mascot replaces the cursor over the showcase (fine pointers only, set by script). */
+.showcase.has-mascot,
+.showcase.has-mascot * { cursor: none; }
+.mascot-cursor {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 30;
-  width: clamp(260px, 26vw, 420px);
-  aspect-ratio: 16 / 10;
-  margin: calc(clamp(260px, 26vw, 420px) * -0.3125) 0 0 calc(clamp(260px, 26vw, 420px) * -0.5);
+  z-index: 60;
+  width: 28px;
+  height: auto;
+  margin: -22px 0 0 -14px;   /* hotspot: centre of the mascot's face */
   pointer-events: none;
   opacity: 0;
+  transform-origin: 50% 74%;
+  transition: opacity 0.35s var(--ease-soft);
   will-change: transform;
 }
-.showcase__preview.is-visible { opacity: 1; }
-.showcase__frame {
-  position: absolute;
-  inset: 0;
-  aspect-ratio: auto;
-  border-radius: 18px;
-  box-shadow: 0 0 0 1px var(--hair), 0 40px 80px -30px rgba(10, 10, 10, 0.45);
-  clip-path: inset(50% 50% 50% 50% round 18px);
-  transition: clip-path 0.9s var(--ease);
+.mascot-cursor svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 3px 4px rgba(220, 37, 40, 0.25)); }
+.mascot-cursor.is-on { opacity: 1; }
+.mascot-cursor__lids rect {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+  animation: blink-lids 4.2s infinite;
 }
-.showcase__frame.is-active { clip-path: inset(0 0 0 0 round 18px); }
-.showcase__frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@keyframes blink-lids {
+  0%, 92%, 100% { transform: scaleY(0); }
+  95% { transform: scaleY(1); }
+}
+.mascot-cursor.is-hot .mascot-cursor__lids rect { animation-duration: 1.6s; }
 
 @media (hover: none), (pointer: coarse) {
-  .showcase__preview { display: none; }
+  .mascot-cursor { display: none; }
   .showcase__name { color: var(--ink); -webkit-text-stroke: 0; background: none; }
 }
 
@@ -1304,6 +1344,9 @@ body[data-page="institute"] .button:hover .arrow { color: var(--red); }
   .footer__bottom { flex-direction: column; }
 
   .hero__sub { font-size: 11px; letter-spacing: 0.26em; margin-right: -0.26em; }
+  .hero__bar { grid-template-columns: 1fr; justify-items: center; border-top: 0; }
+  .hero__products,
+  .hero__side { display: none; }
   .hero--intro .hero__trace { right: -60px; height: 58%; }
 }
 

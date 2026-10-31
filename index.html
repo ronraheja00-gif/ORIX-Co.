@@ -58,12 +58,13 @@
   </div>
 
   <main id="main">
-    <section class="hero" aria-labelledby="hero-title">
+    <section class="hero hero--home" aria-labelledby="hero-title" data-spot>
       <div class="hero__light" data-parallax="0.18" aria-hidden="true"></div>
+      <div class="hero__spot" aria-hidden="true"></div>
       <svg class="hero__trace" viewBox="0 0 370 530" aria-hidden="true" focusable="false"><path class="trace-fill" d="M0 4 43 110 184 221 327 110 369 4V144L184 287 0 144Z"/><path d="M0 4 43 110 184 221 327 110 369 4V144L184 287 0 144Z"/><path class="trace-fill" d="M0 170 163 293 133 330 52 267Z"/><path d="M0 170 163 293 133 330 52 267Z"/><path class="trace-fill" d="M369 166 315 266 234 333V485L184 528 134 485V331L184 307Z"/><path d="M369 166 315 266 234 333V485L184 528 134 485V331L184 307Z"/></svg>
       <div class="hero__content">
         <div data-reveal><svg class="hero__mark" viewBox="0 0 370 530" aria-hidden="true" focusable="false"><path fill="#CC111A" d="M0 4 43 110 184 221 327 110 369 4V144L184 287 0 144Z"/><path fill="#CC111A" d="M0 170 163 293 133 330 52 267Z"/><path fill="#CC111A" d="M369 166 315 266 234 333V485L184 528 134 485V331L184 307Z"/><path fill="#A30C14" d="M134 331 184 307V528L134 485Z"/></svg></div>
-        <h1 class="hero__title" id="hero-title" data-c="home.hero.title" data-amp data-reveal>ORIX <span class="amp">&amp;</span> Co.</h1>
+        <h1 class="hero__title" id="hero-title" data-c="home.hero.title" data-amp data-split>ORIX <span class="amp">&amp;</span> Co.</h1>
         <p class="hero__sub eyebrow" data-c="home.hero.sub" data-reveal style="--d:200ms">Built by the team behind SuperOrix</p>
         <div class="hero__cta" data-reveal style="--d:400ms">
           <a class="cta" href="products.html" data-href="home.hero.ctaHref">
@@ -72,9 +73,17 @@
           </a>
         </div>
       </div>
-      <div class="scroll-cue" aria-hidden="true">
-        <span data-c="home.hero.scroll">Scroll</span>
-        <span class="scroll-cue__line"></span>
+      <div class="hero__bar" data-reveal style="--d:700ms">
+        <ul class="hero__products eyebrow" data-render="hero-products" aria-label="Products">
+          <li><a class="link" href="products.html#elements">Elements</a></li>
+          <li><a class="link" href="products.html#netherite">Netherite</a></li>
+          <li><a class="link" href="products.html#phantom">Phantom</a></li>
+        </ul>
+        <div class="scroll-cue" aria-hidden="true">
+          <span data-c="home.hero.scroll">Scroll</span>
+          <span class="scroll-cue__line"></span>
+        </div>
+        <a class="hero__side eyebrow link" href="institute.html" data-href="home.hero.sideLink.href" data-c="home.hero.sideLink.label">Adore Institute of Technology</a>
       </div>
     </section>
 
@@ -110,8 +119,16 @@
           <li><a class="showcase__row" href="products.html#phantom"><span class="showcase__name">Phantom</span></a></li>
         </ol>
       </div>
-      <div class="showcase__preview" data-showcase-preview aria-hidden="true"></div>
     </section>
+    <div class="mascot-cursor" data-mascot aria-hidden="true">
+      <svg viewBox="440 358 350 518" focusable="false"><g fill="#DC2528" fill-rule="evenodd">
+    <path d="M447 365 513 430V451L614 515 715 451V430L782 365V473L614 573 447 473Z"/>
+    <path d="M447 503 614 601 782 503V665H752V705H692L686 714 614 767 542 714 536 705H478V665H447ZM518 620V665H553V620ZM677 620V665H712V620Z"/>
+    <path d="M527 733 614 795 703 733 738 810V870H698V833H678V870H646V833H585V870H553V833H532V870H492V810Z"/>
+  </g>
+        <g class="mascot-cursor__lids" fill="#DC2528"><rect x="518" y="620" width="35" height="45"/><rect x="677" y="620" width="35" height="45"/></g>
+      </svg>
+    </div>
 
     <section class="band" aria-labelledby="partners-title">
       <div class="band__label">

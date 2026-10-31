@@ -81,17 +81,17 @@ const CONFIG = {
       // `layers`: how many rows. Items are dealt across rows in order; alternate rows scroll the other way.
       layers: 2,
       items: [
-        { name: "MIT India — Maharashtra Institute of Technology", logo: "assets/partners/mit-india.png", width: 402, height: 120 },
-        { name: "Jio Institute", logo: "assets/partners/jio-institute.png", width: 549, height: 120 },
-        { name: "MIT Institute of Design", logo: "assets/partners/mit-institute-of-design.png", width: 375, height: 120 },
-        { name: "AIMA Index 2025 — Investment Maha Kumbh", logo: "assets/partners/aima-index-2025.png", width: 320, height: 120 },
-        { name: "Avantika University", logo: "assets/partners/avantika-university.png", width: 515, height: 120 },
-        { name: "MIT University, Shillong", logo: "assets/partners/mit-university-shillong.png", width: 147, height: 120 },
-        { name: "MIT Academy of Engineering", logo: "assets/partners/mit-academy-of-engineering.png", width: 515, height: 120 },
-        { name: "Edugild", logo: "assets/partners/edugild.png", width: 406, height: 120 },
-        { name: "MIT Arts, Commerce & Science College", logo: "assets/partners/mit-acs-college.png", width: 724, height: 120 },
-        { name: "Vishwashanti Gurukul World School", logo: "assets/partners/vishwashanti-gurukul.png", width: 578, height: 120 },
-        { name: "MIT School of Distance Education", logo: "assets/partners/mit-school-of-distance-education.png", width: 480, height: 120 },
+        { name: "MIT India — Maharashtra Institute of Technology", logo: "assets/partners/mit-india.png", width: 536, height: 160 },
+        { name: "Jio Institute", logo: "assets/partners/jio-institute.png", width: 733, height: 160 },
+        { name: "MIT Institute of Design", logo: "assets/partners/mit-institute-of-design.png", width: 500, height: 160 },
+        { name: "AIMA Index 2025 — Investment Maha Kumbh", logo: "assets/partners/aima-index-2025.png", width: 463, height: 160 },
+        { name: "Avantika University", logo: "assets/partners/avantika-university.png", width: 696, height: 160 },
+        { name: "MIT University, Shillong", logo: "assets/partners/mit-university-shillong.png", width: 197, height: 160 },
+        { name: "MIT Academy of Engineering", logo: "assets/partners/mit-academy-of-engineering.png", width: 699, height: 160 },
+        { name: "Edugild", logo: "assets/partners/edugild.png", width: 545, height: 160 },
+        { name: "MIT Arts, Commerce & Science College", logo: "assets/partners/mit-acs-college.png", width: 983, height: 160 },
+        { name: "Vishwashanti Gurukul World School", logo: "assets/partners/vishwashanti-gurukul.png", width: 784, height: 160 },
+        { name: "MIT School of Distance Education", logo: "assets/partners/mit-school-of-distance-education.png", width: 654, height: 160 },
       ],
       speed: 36, // pixels per second — lower is slower
     },
@@ -792,6 +792,15 @@ const CONFIG = {
       mascot.classList.remove("is-on", "is-hot");
       ts = 1;
     });
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!inside) return;
+        const el = doc.elementFromPoint(tx, ty);
+        if (!el || !section.contains(el)) section.dispatchEvent(new PointerEvent("pointerleave"));
+      },
+      { passive: true }
+    );
     section.querySelectorAll(".showcase__row").forEach((row) => {
       row.addEventListener("pointerenter", () => {
         ts = 1.15;
@@ -911,6 +920,13 @@ const CONFIG = {
 
       const first = (data.name || "").trim().split(/\s+/)[0];
       status.textContent = tpl(A.success, { first });
+      const hi = form.querySelector(".mascot-hi");
+      if (hi) {
+        hi.hidden = false;
+        hi.classList.remove("is-waving");
+        void hi.offsetWidth;
+        hi.classList.add("is-waving");
+      }
       form.classList.add("is-sent");
       form.reset();
       fields.forEach((f) => f.removeAttribute("aria-invalid"));

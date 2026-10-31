@@ -873,7 +873,32 @@ const CONFIG = {
     // and stopping pulls it back into one round shape.
     const N = 10;
     const nodes = Array.from({ length: N }, () => ({ x: 0, y: 0 }));
-    let cx = 0, cy = 0, inside = false, size = 0, placed = false, raf = 0, visible = true;
+    let cx = 0, cy = 0, inside = false, size = 0, sizeV = 0, placed = false, raf = 0, visible = true;
+    // the head is a pool of water: a smooth outline whose edge ripples gently and slowly
+    const RIPPLE = [
+      { k: 2, a: 0.055, w: 0.55 },
+      { k: 3, a: 0.04, w: -0.8 },
+      { k: 5, a: 0.018, w: 1.25 },
+    ];
+    const RIPPLE_MAX = RIPPLE.reduce((m, h) => m + h.a, 0);
+    const pool = (x, y, r, t) => {
+      const n = 36, p = [];
+      for (let i = 0; i < n; i++) {
+        const th = (i / n) * Math.PI * 2;
+        let f = 1;
+        RIPPLE.forEach((h) => (f += h.a * Math.sin(h.k * th + t * h.w + h.k)));
+        p.push([x + Math.cos(th) * r * f, y + Math.sin(th) * r * f]);
+      }
+      // closed Catmull-Rom curve through the points, written as cubic Béziers
+      let d = `M${p[0][0].toFixed(1)} ${p[0][1].toFixed(1)}`;
+      for (let i = 0; i < n; i++) {
+        const p0 = p[(i - 1 + n) % n], p1 = p[i], p2 = p[(i + 1) % n], p3 = p[(i + 2) % n];
+        const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
+        const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
+        d += `C${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+      }
+      return d + "Z";
+    };
     const baseR = () => Math.max(90, Math.min(160, hero.clientWidth * 0.1));
 
     hero.addEventListener("pointermove", (e) => {
@@ -910,9 +935,13 @@ const CONFIG = {
       return "M" + p.map((q) => q[0].toFixed(1) + " " + q[1].toFixed(1)).join("L") + "Z";
     };
 
-    const frame = () => {
+    const frame = (now) => {
       const R = baseR();
-      size += ((inside ? 1 : 0) - size) * (inside ? 0.09 : 0.07);
+      const t = now / 1000;
+      // spring for the size, so the pool spreads out with a soft overshoot like a landing drop
+      sizeV += ((inside ? 1 : 0) - size) * (inside ? 0.06 : 0.05);
+      sizeV *= 0.8;
+      size = Math.max(0, size + sizeV);
 
       // spring the rope
       nodes[0].x += (cx - nodes[0].x) * 0.32;
@@ -921,16 +950,19 @@ const CONFIG = {
         nodes[i].x += (nodes[i - 1].x - nodes[i].x) * 0.42;
         nodes[i].y += (nodes[i - 1].y - nodes[i].y) * 0.42;
       }
+      // the tail stays inside the pool's innermost edge, so at rest only the pool's outline shows
+      const inner = 1 - RIPPLE_MAX;
       const pts = nodes.map((n, i) => {
         const k = i / (N - 1);
-        return { x: n.x, y: n.y, r: R * size * (1 - 0.72 * k * k) };
+        return { x: n.x, y: n.y, r: R * size * inner * (1 - 0.82 * Math.pow(k, 1.15)) };
       });
 
       let d = "";
-      for (let i = 0; i < pts.length; i++) {
+      if (pts[0].r >= 0.8) d += pool(pts[0].x, pts[0].y, R * size, t);
+      for (let i = 1; i < pts.length; i++) {
         if (pts[i].r < 0.8) continue;
         d += circle(pts[i].x, pts[i].y, pts[i].r);
-        if (i > 0 && pts[i - 1].r >= 0.8) d += bridge(pts[i - 1], pts[i]);
+        if (pts[i - 1].r >= 0.8) d += bridge(pts[i - 1], pts[i]);
       }
       ink.style.clipPath = d ? `path("${d}")` : "inset(50%)";
 
@@ -940,7 +972,7 @@ const CONFIG = {
       }
       const tail = nodes[N - 1];
       const moving = Math.abs(cx - tail.x) + Math.abs(cy - tail.y) > 0.3;
-      const busy = visible && (inside || size > 0.004 || moving);
+      const busy = visible && (inside || size > 0.004 || Math.abs(sizeV) > 0.001 || moving);
       raf = busy ? requestAnimationFrame(frame) : 0;
     };
     const kick = () => {

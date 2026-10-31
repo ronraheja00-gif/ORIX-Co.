@@ -653,6 +653,7 @@ svg { display: block; }
   background: var(--white);
   color: var(--ink);
   border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
   overflow: hidden;
 }
 .band__label {
@@ -674,8 +675,6 @@ svg { display: block; }
 .marquee.is-running .marquee__track {
   animation: marquee var(--marquee-duration, 60s) linear infinite;
 }
-.marquee:hover .marquee__track,
-.marquee:focus-within .marquee__track { animation-play-state: paused; }
 
 .marquees { display: grid; gap: clamp(20px, 2.6vw, 36px); }
 .marquee--reverse.is-running .marquee__track { animation-direction: reverse; }

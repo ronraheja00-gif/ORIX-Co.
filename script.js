@@ -848,8 +848,8 @@ const CONFIG = {
 
   /* ---------- hero: liquid reveal ----------
      A dark "night" copy of the hero sits on top, clipped to a liquid blob that trails the cursor.
-     The blob is a chain of circles joined by tangent bridges, so its outline is smooth like a fluid;
-     the trail shrinks away behind the pointer and every point wobbles a little. */
+     The blob is a short spring chain of circles joined by tangent bridges, so its outline stays
+     smooth and tight: it stretches into a teardrop when moving and rounds off when still. */
   function initLiquid() {
     const hero = doc.querySelector("[data-spot]");
     if (!hero || reduceMotion.matches) return;
@@ -868,37 +868,28 @@ const CONFIG = {
     hero.append(ink);
 
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const trail = []; // { x, y, r, life, seed } in hero coordinates
-    let cx = 0, cy = 0, inside = false, head = 0, last = null, raf = 0, visible = true, prev = performance.now();
-    const baseR = () => 24; // about twice a cursor (≈48px across)
-
-    const addPoint = (x, y) => {
-      if (last) {
-        const dx = x - last.x, dy = y - last.y, d = Math.hypot(dx, dy);
-        const steps = Math.min(24, Math.floor(d / 8));
-        for (let i = 1; i <= steps; i++) {
-          trail.push({ x: last.x + (dx * i) / (steps + 1), y: last.y + (dy * i) / (steps + 1), life: 1, seed: Math.random() * 6.28 });
-        }
-      }
-      trail.push({ x, y, life: 1, seed: Math.random() * 6.28 });
-      last = { x, y };
-      if (trail.length > 140) trail.splice(0, trail.length - 140);
-    };
+    // A short spring "rope": node 0 chases the cursor, every other node chases the one before it.
+    // Radii shrink smoothly towards the tail, so moving stretches the blob into a tight teardrop
+    // and stopping pulls it back into one round shape.
+    const N = 10;
+    const nodes = Array.from({ length: N }, () => ({ x: 0, y: 0 }));
+    let cx = 0, cy = 0, inside = false, size = 0, placed = false, raf = 0, visible = true;
+    const baseR = () => Math.max(90, Math.min(160, hero.clientWidth * 0.1));
 
     hero.addEventListener("pointermove", (e) => {
       if (!finePointer.matches) return;
       const r = hero.getBoundingClientRect();
       cx = e.clientX - r.left;
       cy = e.clientY - r.top;
-      if (!inside) last = null;
+      if (!inside && size < 0.05) placed = false;
       inside = true;
-      addPoint(cx, cy);
+      if (!placed) {
+        nodes.forEach((n) => ((n.x = cx), (n.y = cy)));
+        placed = true;
+      }
       kick();
     });
-    hero.addEventListener("pointerleave", () => {
-      inside = false;
-      last = null;
-    });
+    hero.addEventListener("pointerleave", () => (inside = false));
 
     const circle = (x, y, r) =>
       `M${(x + r).toFixed(1)} ${y.toFixed(1)}A${r.toFixed(1)} ${r.toFixed(1)} 0 1 1 ${(x - r).toFixed(1)} ${y.toFixed(1)}A${r.toFixed(1)} ${r.toFixed(1)} 0 1 1 ${(x + r).toFixed(1)} ${y.toFixed(1)}Z`;
@@ -919,31 +910,27 @@ const CONFIG = {
       return "M" + p.map((q) => q[0].toFixed(1) + " " + q[1].toFixed(1)).join("L") + "Z";
     };
 
-    const frame = (now) => {
-      const dt = Math.min(0.05, (now - prev) / 1000);
-      prev = now;
-      const t = now / 1000;
+    const frame = () => {
       const R = baseR();
-      head += ((inside ? 1 : 0) - head) * (inside ? 0.12 : 0.08);
+      size += ((inside ? 1 : 0) - size) * (inside ? 0.09 : 0.07);
 
-      for (let i = trail.length - 1; i >= 0; i--) {
-        trail[i].life -= dt / 1.4;
-        if (trail[i].life <= 0) trail.splice(i, 1);
+      // spring the rope
+      nodes[0].x += (cx - nodes[0].x) * 0.32;
+      nodes[0].y += (cy - nodes[0].y) * 0.32;
+      for (let i = 1; i < N; i++) {
+        nodes[i].x += (nodes[i - 1].x - nodes[i].x) * 0.42;
+        nodes[i].y += (nodes[i - 1].y - nodes[i].y) * 0.42;
       }
-      const pts = trail.map((p) => {
-        // behind the cursor the liquid spreads wider (up to ~2.2x), then tapers off at the end
-        const age = 1 - p.life;
-        const spread = R + R * 1.2 * Math.sin(Math.PI * Math.min(1, age * 1.5));
-        const fade = 1 - Math.pow(age, 3);
-        return { x: p.x, y: p.y, r: spread * fade * (1 + 0.09 * Math.sin(t * 3.1 + p.seed)) };
+      const pts = nodes.map((n, i) => {
+        const k = i / (N - 1);
+        return { x: n.x, y: n.y, r: R * size * (1 - 0.72 * k * k) };
       });
-      if (head > 0.01 && last) pts.push({ x: cx, y: cy, r: R * head * (1 + 0.05 * Math.sin(t * 2.3)) });
 
       let d = "";
       for (let i = 0; i < pts.length; i++) {
-        if (pts[i].r < 1) continue;
+        if (pts[i].r < 0.8) continue;
         d += circle(pts[i].x, pts[i].y, pts[i].r);
-        if (i > 0 && pts[i - 1].r >= 1) d += bridge(pts[i - 1], pts[i]);
+        if (i > 0 && pts[i - 1].r >= 0.8) d += bridge(pts[i - 1], pts[i]);
       }
       ink.style.clipPath = d ? `path("${d}")` : "inset(50%)";
 
@@ -951,14 +938,13 @@ const CONFIG = {
         hero.style.setProperty("--mx", ((cx / hero.clientWidth) * 100).toFixed(2) + "%");
         hero.style.setProperty("--my", ((cy / hero.clientHeight) * 100).toFixed(2) + "%");
       }
-      const busy = visible && (inside || trail.length || head > 0.01);
+      const tail = nodes[N - 1];
+      const moving = Math.abs(cx - tail.x) + Math.abs(cy - tail.y) > 0.3;
+      const busy = visible && (inside || size > 0.004 || moving);
       raf = busy ? requestAnimationFrame(frame) : 0;
     };
     const kick = () => {
-      if (!raf && visible) {
-        prev = performance.now();
-        raf = requestAnimationFrame(frame);
-      }
+      if (!raf && visible) raf = requestAnimationFrame(frame);
     };
 
     new IntersectionObserver(([entry]) => {

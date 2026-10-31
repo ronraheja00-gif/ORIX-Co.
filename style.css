@@ -1480,14 +1480,7 @@ body[data-page="institute"] .button:hover .arrow { color: var(--red); }
   .footer__nav { grid-column: 1 / span 6; }
   .footer__contact { grid-column: 7 / span 6; }
 
-  .hero__trace--wide {
-  width: min(1500px, 96vw);
-  height: min(86%, 820px);
-}
-.hero__trace--wide path { stroke: rgba(10, 10, 10, 0.07); }
-
-
-.hero--intro .hero__trace { opacity: 0.6; }
+  .hero--intro .hero__trace { opacity: 0.6; }
 }
 
 @media (max-width: 600px) {
@@ -1513,14 +1506,7 @@ body[data-page="institute"] .button:hover .arrow { color: var(--red); }
   .hero__bar { grid-template-columns: 1fr; justify-items: center; border-top: 0; }
   .hero__products,
   .hero__side { display: none; }
-  .hero__trace--wide {
-  width: min(1500px, 96vw);
-  height: min(86%, 820px);
-}
-.hero__trace--wide path { stroke: rgba(10, 10, 10, 0.07); }
-
-
-.hero--intro .hero__trace { right: -60px; height: 58%; }
+  .hero--intro .hero__trace { right: -60px; height: 58%; }
 }
 
 @media (min-width: 1700px) {

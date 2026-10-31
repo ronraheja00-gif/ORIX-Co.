@@ -870,12 +870,12 @@ const CONFIG = {
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const trail = []; // { x, y, r, life, seed } in hero coordinates
     let cx = 0, cy = 0, inside = false, head = 0, last = null, raf = 0, visible = true, prev = performance.now();
-    const baseR = () => Math.max(60, Math.min(130, hero.clientWidth * 0.085));
+    const baseR = () => 24; // about twice a cursor (≈48px across)
 
     const addPoint = (x, y) => {
       if (last) {
         const dx = x - last.x, dy = y - last.y, d = Math.hypot(dx, dy);
-        const steps = Math.min(12, Math.floor(d / 14));
+        const steps = Math.min(24, Math.floor(d / 8));
         for (let i = 1; i <= steps; i++) {
           trail.push({ x: last.x + (dx * i) / (steps + 1), y: last.y + (dy * i) / (steps + 1), life: 1, seed: Math.random() * 6.28 });
         }

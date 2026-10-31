@@ -492,9 +492,9 @@ svg { display: block; }
 .hero--ink .scroll-cue { color: rgba(255, 255, 255, 0.5); }
 .hero--ink .scroll-cue__line { background: var(--hair-dark); }
 .hero--ink .scroll-cue__line::after { background: var(--white); }
-/* the hidden watermark, drawn in fine red lines */
-.hero--ink .hero__trace path { stroke: rgba(225, 30, 36, 0.75); }
-.hero--ink .hero__trace .trace-fill { fill: rgba(225, 30, 36, 0.04); stroke: none; }
+/* the hidden watermark: crisp red edges with a soft red fill so the logo reads clearly */
+.hero--ink .hero__trace path { stroke: var(--red); stroke-width: 1.6; }
+.hero--ink .hero__trace .trace-fill { fill: rgba(204, 17, 26, 0.32); stroke: none; }
 .hero--intro .hero__trace {
   left: auto;
   right: var(--gutter);

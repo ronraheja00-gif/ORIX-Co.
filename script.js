@@ -57,8 +57,15 @@ const CONFIG = {
     },
     about: {
       label: "About",
-      statement: "We build *quiet* technology with uncommon care.",
-      body: "A small team of engineers and designers. We compete, we ship, and we hold the work to a standard few will ever see.",
+      statement: "We build *deep* tech as real products, and teach the skills behind them.",
+      body: "{name} is a technology company working at the hard end of the field: high tech, deep tech and products we design, ship and support ourselves. Through {institute}, we pass that craft on, so people learn real-world skills by doing real work.",
+      // What we focus on. Shown as a four-column index under the statement.
+      pillars: [
+        { title: "High tech", text: "Modern software and systems, engineered for performance and built to last." },
+        { title: "Deep tech", text: "Research-led work on hard problems, taken from first principles to a working system." },
+        { title: "Product-first", text: "We build our own products end to end. Things people actually use, not slideware." },
+        { title: "Real-world skills", text: "Hands-on learning drawn from live projects, so people leave able to do the work." },
+      ],
       // Placeholders — replace with verified figures.
       stats: [
         { value: "3×", label: "Hackathon winners" },
@@ -433,6 +440,18 @@ const CONFIG = {
   }
 
   const renderers = {
+    pillars(el) {
+      el.replaceChildren(
+        ...C.home.about.pillars.map((p, i) =>
+          h("li", { class: "pillar", "data-reveal": "", style: `--d:${i * 110}ms` }, [
+            h("span", { class: "pillar__num", "aria-hidden": "true", text: String(i + 1).padStart(2, "0") }),
+            h("h3", { class: "pillar__title", text: tpl(p.title) }),
+            h("p", { class: "pillar__text", text: tpl(p.text) }),
+          ])
+        )
+      );
+    },
+
     stats(el) {
       el.replaceChildren(
         ...C.home.about.stats.map((s, i) =>

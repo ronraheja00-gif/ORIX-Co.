@@ -30,7 +30,7 @@ All copy lives in the `CONFIG` object at the top of `script.js`.
 | Contact email | `EMAIL` |
 | Placement wording | `PLACEMENT_CLAIM`, `PLACEMENT_NOTE` |
 | Page titles and descriptions | `meta.home`, `meta.products`, `meta.institute` |
-| Home stats, product showcase, partners strip | `home.about.stats`, `home.showcase`, `home.partners` |
+| About section (statement, body, focus areas, figures), product showcase, partners strip | `home.about` (`statement`, `body`, `pillars`, `stats`), `home.showcase`, `home.partners` |
 | Products | `products.items` (name, description, tags, status, href, visual or image, downloads) |
 | Download cards | `products.platforms` (Windows / Linux / macOS labels, notes, file names) and each product's `downloads` links |
 | Programs and steps | `institute.programs.items`, `institute.steps.items` |
